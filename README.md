@@ -1,4 +1,6 @@
-# CIHUY — Control It, Hold Yourself
+# Project-CIHUY
+
+**CIHUY — Control It, Hold Yourself**
 
 Aplikasi Android berbasis Flutter untuk membantu pengguna mencatat konsumsi rokok/vape, menghadapi craving, dan memantau target harian.
 
