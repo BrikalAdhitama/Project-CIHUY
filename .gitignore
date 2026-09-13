@@ -1,0 +1,26 @@
+# Local editor settings
+.idea/
+*.iml
+.codex/
+
+# Backend will be added when its first implementation is ready.
+/backend_cihuy/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+**/key.properties
+*.jks
+*.keystore
+
+# Generated Flutter files and installable builds
+**/.dart_tool/
+**/.flutter-plugins-dependencies
+**/build/
+**/coverage/
+**/.gradle/
+**/local.properties
+*.apk
+*.aab
+*.log

@@ -1,0 +1,42 @@
+name: cihuy
+description: "CIHUY — Control It, Hold Yourself. Demo Flutter Android tanpa backend."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  provider: ^6.1.5
+  intl: ^0.20.2
+  image_picker: ^1.2.3
+  flutter_svg: ^2.3.0
+  image_cropper: ^12.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: assets/icon-app.png
+  adaptive_icon_background: '#CFF8EE'
+  adaptive_icon_foreground: assets/icon-app.png
+  adaptive_icon_foreground_inset: 0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon-app.png
+    - assets/calendar-day.svg
+    - assets/smoking-ban.svg
+    - assets/smoking.svg
+    - assets/user-heart.svg
+    - assets/user.svg
