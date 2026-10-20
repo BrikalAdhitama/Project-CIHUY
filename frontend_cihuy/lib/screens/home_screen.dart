@@ -7,6 +7,8 @@ import '../utils/app_theme.dart';
 import '../utils/dates.dart';
 import '../widgets/asset_icon.dart';
 import '../widgets/common.dart';
+import '../widgets/craving_pattern.dart';
+import '../widgets/daily_consumption_warning.dart';
 import 'targets_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -24,6 +26,8 @@ class HomeScreen extends StatelessWidget {
         Text('Beranda', style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 12),
         const QuitTimerCard(),
+        const SizedBox(height: 16),
+        const _DailyLimitWarnings(),
         const SizedBox(height: 16),
         SurfaceCard(
           onTap: () => state.selectDate(today, openCalendar: true),
@@ -93,6 +97,8 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 16),
+        const CravingPatternSummary(),
         const SizedBox(height: 18),
         SectionTitle(
           'Riwayat',
@@ -194,6 +200,39 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+class _DailyLimitWarnings extends StatelessWidget {
+  const _DailyLimitWarnings();
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<AppState>();
+    final today = dayOnly(state.now);
+    final progress = state.progress;
+    final entries = [
+      for (final habit in Habit.values)
+        if (progress.targetOn(today, habit) case final target?)
+          (
+            habit: habit,
+            current: progress.total(today, habit),
+            limit: target.limit,
+          ),
+    ];
+    return Column(
+      children: [
+        for (final (index, entry) in entries.indexed) ...[
+          if (index > 0) const SizedBox(height: 10),
+          DailyConsumptionWarning(
+            key: ValueKey(entry.habit),
+            habit: entry.habit,
+            currentConsumption: entry.current,
+            dailyLimit: entry.limit,
+          ),
+        ],
       ],
     );
   }

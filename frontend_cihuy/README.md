@@ -31,14 +31,16 @@ APK: `build/app/outputs/flutter-apk/app-debug.apk`.
 - Beranda: timer berdasarkan waktu konsumsi terbaru, current/best streak, rangkuman tujuh hari, motivasi, riwayat tanggal, target hari ini, dan tombol catat.
 - Sheet pemilih catatan, tambah/edit konsumsi, serta tambah/edit craving dengan pemicu bebas dan hasil penanganan.
 - Kalender Min–Sab, pemilihan bulan/tanggal, grafik tujuh hari yang berakhir pada tanggal pilihan, detail konsumsi/craving, lihat/edit/hapus dengan konfirmasi, serta detail progres.
-- Profil, ganti/hapus foto dari galeri, edit nama/alasan, target aktif/terjadwal dan riwayat versi, nonaktifkan target, serta simulasi login, registrasi, pemulihan/ubah kata sandi, onboarding, keluar, dan hapus akun.
+- Profil, ganti/hapus foto dari galeri, edit nama/alasan, target aktif/terjadwal dan riwayat versi, nonaktifkan target, serta autentikasi lokal, pemulihan kata sandi dengan kode pemulihan, onboarding, keluar, dan hapus akun.
 - Tiga tab mempertahankan state. Tombol kembali menutup modal/rute terlebih dahulu, kemudian kembali dari Kalender/Profil ke Beranda.
 
 ## Data demo dan aturan progres
 
-Aplikasi langsung membuka demo terisi. Pilih **Profil → Mode demo → Coba pengguna baru** untuk keadaan kosong/onboarding, atau **Muat ulang demo terisi** untuk mengulang skenario. Pilihan tersebut meminta konfirmasi sebelum mengganti data sesi.
+Aplikasi baru membuka layar login. Pilih **Jelajahi demo dengan data terisi** untuk mengulang skenario demo, atau gunakan **Profil → Mode demo → Coba pengguna baru** saat sedang melihat demo. Pilihan tersebut meminta konfirmasi sebelum mengganti data sesi.
 
-Data hanya disimpan dalam memory dan hilang saat proses aplikasi dimulai ulang. Tidak ada server, database lokal, SDK autentikasi, Firebase, Supabase, atau permintaan jaringan di runtime aplikasi. Akun/password hanya simulasi; alamat `contoh.test` sengaja digunakan sebagai data contoh. Dependency pengembangan/debug Flutter dapat memakai internet saat setup dan debugging.
+Autentikasi berjalan offline tanpa server, Firebase, Supabase, REST API, atau permintaan jaringan. Daftar akun disimpan lokal sebagai JSON melalui `shared_preferences`; password disimpan sebagai hash PBKDF2-HMAC-SHA256 dengan salt acak per akun, bukan plaintext. ID sesi disimpan melalui `flutter_secure_storage`. Status onboarding, nama, email, alasan, dan kode pemulihan (hanya hash) disimpan per akun. Kode pemulihan ditampilkan satu kali setelah registrasi dan setelah reset; kode lama diinvalidasi saat reset.
+
+Data tracking demo dan catatan prototipe masih disimpan dalam memory dan hilang saat proses aplikasi dimulai ulang. Akun lokal bukan autentikasi production-ready: keamanan perangkat, backup, rate limiting, dan pemulihan lintas perangkat belum tersedia. Dependency pengembangan/debug Flutter dapat memakai internet saat setup dan debugging.
 
 Seed dibuat sekali saat sesi/skenario dimulai dan memakai tanggal relatif terhadap hari ini. Pada 12 September, tanggal 7 berisi enam entri rokok masing-masing satu batang, dengan batas historis lima batang. Pada tanggal lain, skenario ini mengikuti hari kelima sebelum hari ini.
 

@@ -20,7 +20,11 @@ void main() {
   }) async {
     tester.view.physicalSize = Size(width, 844);
     tester.view.devicePixelRatio = 1;
-    final state = AppState(clock: () => now, store: store, autoTick: false);
+    final state = AppState(
+      clock: () => now,
+      store: store ?? MockStore.demo(now),
+      autoTick: false,
+    );
     await tester.pumpWidget(CihuyApp(state: state));
     await tester.pumpAndSettle();
     addTearDown(() async {
@@ -293,6 +297,12 @@ void main() {
     expect(find.text('Ingin lebih sehat bersama keluarga.'), findsOneWidget);
     await tap(tester, find.byKey(const Key('tab-calendar')));
     expect(find.byType(ExceededBadge), findsNothing);
+    // Pemilih rentang baru menambah tinggi kartu; muat bagian bawah dulu.
+    await tester.drag(
+      find.byKey(const PageStorageKey('calendar-scroll')),
+      const Offset(0, -300),
+    );
+    await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Belum ada catatan konsumsi.'));
     expect(find.text('Belum ada catatan konsumsi.'), findsOneWidget);
     expect(tester.takeException(), isNull);

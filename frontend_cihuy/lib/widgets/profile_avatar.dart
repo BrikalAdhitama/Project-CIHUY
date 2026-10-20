@@ -46,7 +46,7 @@ class ProfileAvatar extends StatelessWidget {
               const Padding(
                 padding: EdgeInsets.fromLTRB(18, 8, 18, 8),
                 child: Text(
-                  'Foto hanya tersimpan selama sesi demo ini.',
+                  'Foto hanya tersimpan selama sesi aplikasi ini.',
                   style: TextStyle(color: CihuyColors.muted, fontSize: 12),
                 ),
               ),

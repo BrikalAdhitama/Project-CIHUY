@@ -13,6 +13,8 @@ abstract final class CihuyColors {
   static const success = Color(0xFF00BB86);
   static const pink = Color(0xFFFFE1E4);
   static const red = Color(0xFFE32636);
+  static const amber = Color(0xFFFFF2D6);
+  static const amberInk = Color(0xFF9A6A00);
 }
 
 ThemeData cihuyTheme() {

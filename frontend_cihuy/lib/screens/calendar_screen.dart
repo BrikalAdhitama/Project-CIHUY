@@ -1,4 +1,4 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -288,19 +288,26 @@ class _Legend extends StatelessWidget {
   );
 }
 
-class ConsumptionChart extends StatelessWidget {
+class ConsumptionChart extends StatefulWidget {
   const ConsumptionChart({super.key});
+  @override
+  State<ConsumptionChart> createState() => _ConsumptionChartState();
+}
+
+class _ConsumptionChartState extends State<ConsumptionChart> {
+  int _days = 7;
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
     final end = state.chartEnd;
     final selectedDay = state.selectedDay;
-    final from = shiftDay(end, -6);
+    final from = shiftDay(end, -(_days - 1));
     final habit = state.chartHabit;
-    final dates = List.generate(7, (index) => shiftDay(from, index));
+    final dates = List.generate(_days, (index) => shiftDay(from, index));
     final values = dates
         .map((day) => state.progress.total(day, habit))
         .toList();
+    final total = values.fold(0, (sum, value) => sum + value);
     final maximum = math.max(1, values.reduce(math.max));
     final showHabit =
         state.consumption.any((entry) => entry.habit == Habit.vape) ||
@@ -310,43 +317,109 @@ class ConsumptionChart extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionTitle(
-            'Konsumsi 7 Hari Terakhir',
+            'Konsumsi $_days Hari Terakhir',
             trailing: Text(
               dateRange(from, end),
               key: const Key('chart-range'),
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: SegmentedButton<int>(
+                  segments: const [
+                    ButtonSegment(value: 7, label: Text('7 Hari')),
+                    ButtonSegment(value: 30, label: Text('30 Hari')),
+                  ],
+                  selected: {_days},
+                  showSelectedIcon: false,
+                  onSelectionChanged: (selection) =>
+                      setState(() => _days = selection.first),
+                  style: ButtonStyle(
+                    visualDensity: VisualDensity.compact,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Flexible(
+                child: Text(
+                  'Jumlah ${habit.unit}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 10, color: CihuyColors.muted),
+                  textAlign: TextAlign.right,
+                ),
+              ),
+            ],
+          ),
           if (showHabit) ...[
             const SizedBox(height: 10),
             HabitSelector(value: habit, onChanged: state.selectHabit),
           ],
-          const SizedBox(height: 5),
-          Text(
-            'Jumlah ${habit.unit}',
-            style: const TextStyle(fontSize: 10, color: CihuyColors.muted),
-          ),
           const SizedBox(height: 10),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              for (var index = 0; index < 7; index++)
-                Expanded(
-                  child: ChartBar(
-                    date: dates[index],
-                    amount: values[index],
-                    maximum: maximum,
-                    habit: habit,
-                    exceeded: state.progress.exceeds(dates[index], habit),
-                    selected: sameDay(dates[index], selectedDay),
-                    onTap: () => state.selectDate(
-                      dates[index],
-                      keepChartRange: true,
+          if (_days == 7)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                for (var index = 0; index < _days; index++)
+                  Expanded(
+                    child: ChartBar(
+                      date: dates[index],
+                      amount: values[index],
+                      maximum: maximum,
+                      habit: habit,
+                      exceeded: state.progress.exceeds(dates[index], habit),
+                      selected: sameDay(dates[index], selectedDay),
+                      onTap: () => state.selectDate(
+                        dates[index],
+                        keepChartRange: true,
+                      ),
                     ),
                   ),
+              ],
+            )
+          else
+            SizedBox(
+              height: 140,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    for (var index = 0; index < _days; index++)
+                      SizedBox(
+                        width: 40,
+                        child: ChartBar(
+                          date: dates[index],
+                          amount: values[index],
+                          maximum: maximum,
+                          habit: habit,
+                          exceeded: state.progress.exceeds(
+                            dates[index],
+                            habit,
+                          ),
+                          selected: sameDay(dates[index], selectedDay),
+                          onTap: () => state.selectDate(
+                            dates[index],
+                            keepChartRange: true,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-            ],
-          ),
+              ),
+            ),
+          if (total == 0)
+            const Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: Text(
+                'Belum ada catatan konsumsi pada rentang ini.',
+                style: TextStyle(fontSize: 12, color: CihuyColors.muted),
+              ),
+            ),
         ],
       ),
     );

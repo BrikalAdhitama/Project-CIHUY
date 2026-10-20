@@ -121,7 +121,35 @@ class _TargetCard extends StatelessWidget {
             const Text(
               'Status harian membandingkan jumlah konsumsi dengan target yang berlaku pada tanggal kejadian.',
             ),
+            const SizedBox(height: 8),
+            const Text(
+              'Menonaktifkan target tidak menghapus riwayat; periode lama tetap dipakai untuk statistik hari sebelum tanggal nonaktifnya.',
+              style: TextStyle(fontSize: 12, color: CihuyColors.muted),
+            ),
             const SizedBox(height: 20),
+            if (!history && target.startsOn.isAfter(today)) ...[
+              OutlinedButton(
+                onPressed: () async {
+                  final confirm = await confirmAction(
+                    context,
+                    title: 'Hapus target terjadwal?',
+                    message:
+                        'Target belum pernah berjalan sehingga dapat dihapus permanen tanpa memengaruhi statistik historis.',
+                    confirm: 'Hapus',
+                  );
+                  if (confirm && context.mounted) {
+                    state.removeScheduledTarget(target);
+                    Navigator.pop(context);
+                    showMessage(context, 'Target terjadwal dihapus.');
+                  }
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: CihuyColors.red,
+                ),
+                child: const Text('Hapus permanen'),
+              ),
+              const SizedBox(height: 12),
+            ],
             FilledButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Tutup'),

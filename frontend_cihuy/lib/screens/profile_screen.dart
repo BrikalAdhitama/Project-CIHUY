@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/records.dart';
 import '../providers/app_state.dart';
 import '../utils/app_theme.dart';
 import '../utils/dates.dart';
@@ -172,6 +173,20 @@ class ProfileScreen extends StatelessWidget {
                           const _EditProfileForm(isName: false),
                         ),
                       ),
+                      for (final habit in Habit.values) ...[
+                        const Divider(),
+                        _InfoRow(
+                          icon: habitIcon(habit),
+                          label: 'Rata-rata awal (${habit.label})',
+                          value: state.baseline(habit) == null
+                              ? 'Belum diisi'
+                              : '${state.baseline(habit)} ${habit.unit}/hari',
+                          onEdit: () => openSheet(
+                            context,
+                            _BaselineForm(habit: habit),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -213,6 +228,33 @@ class ProfileScreen extends StatelessWidget {
                         onTap: () => openTargets(context),
                       ),
                       const Divider(),
+                      if (state.hasAccount) ...[
+                        ListTile(
+                          leading: const IconTile(
+                            Icons.delete_outline,
+                            color: CihuyColors.red,
+                            background: Color(0xFFFFF2F3),
+                          ),
+                          title: const Text(
+                            'Hapus akun',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: CihuyColors.red,
+                            ),
+                          ),
+                          onTap: () async {
+                            final yes = await confirmAction(
+                              context,
+                              title: 'Hapus akun?',
+                              message:
+                                  'Akun terdaftar (email, kata sandi, dan pengaturan) dihapus permanen dari perangkat ini. Tindakan ini tidak bisa dibatalkan.',
+                              confirm: 'Hapus akun',
+                            );
+                            if (yes) await state.deleteAccount();
+                          },
+                        ),
+                        const Divider(),
+                      ],
                       ListTile(
                         leading: const IconTile(
                           Icons.logout,
@@ -229,7 +271,7 @@ class ProfileScreen extends StatelessWidget {
                         onTap: () async {
                           final yes = await confirmAction(
                             context,
-                            title: 'Keluar dari demo?',
+                            title: 'Keluar dari akun?',
                             message:
                                 'Data tetap tersedia selama aplikasi belum ditutup.',
                             confirm: 'Keluar',
@@ -237,71 +279,6 @@ class ProfileScreen extends StatelessWidget {
                           );
                           if (yes) state.signOut();
                         },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 22),
-                SurfaceCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Mode demo',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 5),
-                      const Text(
-                        'Data hanya disimpan selama aplikasi berjalan. Akun dan kata sandi disimulasikan; gunakan data contoh.',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: CihuyColors.muted,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextButton(
-                        onPressed: () async {
-                          final yes = await confirmAction(
-                            context,
-                            title: 'Coba pengguna baru?',
-                            message:
-                                'Data demo sesi ini diganti dengan akun kosong dan onboarding.',
-                            confirm: 'Mulai',
-                            destructive: false,
-                          );
-                          if (yes) state.startNewUser();
-                        },
-                        child: const Text('Coba pengguna baru'),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          final yes = await confirmAction(
-                            context,
-                            title: 'Muat ulang demo terisi?',
-                            message:
-                                'Perubahan sesi ini diganti dengan contoh catatan tujuh hari.',
-                            confirm: 'Muat demo',
-                            destructive: false,
-                          );
-                          if (yes) state.startDemo();
-                        },
-                        child: const Text('Muat ulang demo terisi'),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          final yes = await confirmAction(
-                            context,
-                            title: 'Hapus akun simulasi?',
-                            message:
-                                'Profil, target, dan semua catatan dalam sesi demo ini akan dihapus. Tidak ada akun sungguhan yang dihapus.',
-                            confirm: 'Hapus akun simulasi',
-                          );
-                          if (yes) state.deleteAccount();
-                        },
-                        child: const Text(
-                          'Hapus akun (simulasi)',
-                          style: TextStyle(color: CihuyColors.red),
-                        ),
                       ),
                     ],
                   ),
@@ -498,6 +475,75 @@ class _EditProfileFormState extends State<_EditProfileForm> {
             Navigator.pop(context);
           },
           child: const Text('Simpan perubahan'),
+        ),
+      ],
+    ),
+  );
+}
+
+class _BaselineForm extends StatefulWidget {
+  const _BaselineForm({required this.habit});
+  final Habit habit;
+  @override
+  State<_BaselineForm> createState() => _BaselineFormState();
+}
+
+class _BaselineFormState extends State<_BaselineForm> {
+  final _form = GlobalKey<FormState>();
+  late final TextEditingController _text;
+  @override
+  void initState() {
+    super.initState();
+    final value = context.read<AppState>().baseline(widget.habit);
+    _text = TextEditingController(text: value == null ? '' : '$value');
+  }
+
+  @override
+  void dispose() {
+    _text.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Form(
+    key: _form,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SheetHeading(
+          'Rata-rata awal (${widget.habit.label})',
+          subtitle:
+              'Baseline adalah taksiran konsumsi sebelum berhenti. '
+              'Berbeda dari target harian dan tidak mengubah catatan historis.',
+        ),
+        TextFormField(
+          controller: _text,
+          autofocus: true,
+          keyboardType: TextInputType.number,
+          maxLength: 4,
+          decoration: InputDecoration(
+            labelText: 'Rata-rata per hari sebelum mulai berhenti',
+            suffixText: widget.habit.unit,
+          ),
+          validator: (value) {
+            final parsed = int.tryParse(value ?? '');
+            if (parsed == null || parsed < 0) {
+              return 'Isi bilangan bulat 0 atau lebih';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 20),
+        FilledButton(
+          onPressed: () {
+            if (!_form.currentState!.validate()) return;
+            context.read<AppState>().updateBaseline(
+              widget.habit,
+              int.parse(_text.text),
+            );
+            Navigator.pop(context);
+          },
+          child: const Text('Simpan baseline'),
         ),
       ],
     ),

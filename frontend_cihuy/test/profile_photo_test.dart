@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cihuy/app.dart';
 import 'package:cihuy/providers/app_state.dart';
+import 'package:cihuy/services/mock_store.dart';
 import 'package:cihuy/services/profile_photo_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,7 +33,12 @@ void main() {
 
   setUp(() {
     picker = _FakePhotoPicker()..pick = () async => photo;
-    state = AppState(clock: () => now, autoTick: false, photoPicker: picker);
+    state = AppState(
+      clock: () => now,
+      store: MockStore.demo(now),
+      autoTick: false,
+      photoPicker: picker,
+    );
   });
 
   tearDown(() => state.dispose());

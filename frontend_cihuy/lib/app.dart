@@ -20,7 +20,7 @@ class CihuyApp extends StatefulWidget {
 }
 
 class _CihuyAppState extends State<CihuyApp> {
-  late final AppState _state = widget.state ?? AppState();
+  late final AppState _state = widget.state ?? AppState(startSignedIn: false);
   @override
   void initState() {
     super.initState();
@@ -29,6 +29,7 @@ class _CihuyAppState extends State<CihuyApp> {
         defaultTargetPlatform == TargetPlatform.android) {
       unawaited(_state.initializePhotoPicker());
     }
+    if (widget.state == null) unawaited(_state.initializeAuth());
   }
 
   @override
@@ -48,7 +49,9 @@ class _CihuyAppState extends State<CihuyApp> {
       supportedLocales: const [Locale('id', 'ID')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       home: Consumer<AppState>(
-        builder: (context, state, _) => !state.signedIn
+        builder: (context, state, _) => state.authLoading
+            ? const _AuthLoadingScreen()
+            : !state.signedIn
             ? const AuthScreen()
             : state.needsOnboarding
             ? const OnboardingScreen()
@@ -56,6 +59,13 @@ class _CihuyAppState extends State<CihuyApp> {
       ),
     ),
   );
+}
+
+class _AuthLoadingScreen extends StatelessWidget {
+  const _AuthLoadingScreen();
+  @override
+  Widget build(BuildContext context) =>
+      const Scaffold(body: Center(child: CircularProgressIndicator()));
 }
 
 class AppShell extends StatelessWidget {
@@ -123,37 +133,51 @@ class AppShell extends StatelessWidget {
               ),
             ],
           ),
-          child: BottomNavigationBar(
-            currentIndex: state.tab,
-            onTap: state.selectTab,
-            elevation: 0,
-            backgroundColor: Colors.white,
-            selectedItemColor: CihuyColors.teal,
-            unselectedItemColor: const Color(0xFF98A2B3),
-            selectedFontSize: 12,
-            unselectedFontSize: 12,
-            type: BottomNavigationBarType.fixed,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined, key: Key('tab-home')),
-                activeIcon: Icon(Icons.home_rounded, key: Key('tab-home')),
-                label: 'Beranda',
+          child: SafeArea(
+            top: false,
+            child: BottomNavigationBar(
+              currentIndex: state.tab,
+              onTap: state.selectTab,
+              elevation: 0,
+              backgroundColor: Colors.white,
+              type: BottomNavigationBarType.fixed,
+              iconSize: 24,
+              selectedItemColor: CihuyColors.teal,
+              unselectedItemColor: const Color(0xFF98A2B3),
+              selectedFontSize: 12,
+              unselectedFontSize: 12,
+              selectedLabelStyle: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                height: 1.2,
               ),
-              BottomNavigationBarItem(
-                icon: CihuyAssetIcon(
-                  CihuyAssetIcon.calendar,
-                  key: Key('tab-calendar'),
+              unselectedLabelStyle: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                height: 1.2,
+              ),
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home_outlined, key: Key('tab-home')),
+                  activeIcon: Icon(Icons.home_rounded, key: Key('tab-home')),
+                  label: 'Beranda',
                 ),
-                label: 'Kalender',
-              ),
-              BottomNavigationBarItem(
-                icon: CihuyAssetIcon(
-                  CihuyAssetIcon.profile,
-                  key: Key('tab-profile'),
+                BottomNavigationBarItem(
+                  icon: CihuyAssetIcon(
+                    CihuyAssetIcon.calendar,
+                    key: Key('tab-calendar'),
+                  ),
+                  label: 'Kalender',
                 ),
-                label: 'Profil',
-              ),
-            ],
+                BottomNavigationBarItem(
+                  icon: CihuyAssetIcon(
+                    CihuyAssetIcon.profile,
+                    key: Key('tab-profile'),
+                  ),
+                  label: 'Profil',
+                ),
+              ],
+            ),
           ),
         ),
       ),

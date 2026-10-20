@@ -6,10 +6,11 @@ class MockStore {
   MockStore.empty(
     DateTime now, {
     String name = 'Pengguna Baru',
+    String email = 'pengguna@contoh.test',
     String reason = 'Saya ingin hidup lebih sehat.',
   }) : profile = UserProfile(
          name: name,
-         email: 'pengguna@contoh.test',
+         email: email,
          reason: reason,
          startedAt: now,
        );
