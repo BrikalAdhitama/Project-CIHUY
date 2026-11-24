@@ -1,0 +1,174 @@
+:root {
+  color-scheme: light;
+  --ink: #10312c;
+  --muted: #5b6f6b;
+  --teal: #0f5f57;
+  --teal-soft: #e8f4f1;
+  --line: #d9e6e3;
+  --bg: #f6faf9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.65;
+  font-size: 16px;
+}
+
+.wrap {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 32px 20px 72px;
+}
+
+header.site {
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+
+header.site .wrap {
+  padding-top: 18px;
+  padding-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand {
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--teal);
+  text-decoration: none;
+}
+
+header.site nav {
+  margin-left: auto;
+  display: flex;
+  gap: 18px;
+  font-size: 14px;
+}
+
+header.site nav a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+header.site nav a:hover {
+  color: var(--teal);
+}
+
+h1 {
+  font-size: 30px;
+  line-height: 1.25;
+  margin: 28px 0 6px;
+}
+
+h2 {
+  font-size: 20px;
+  margin: 34px 0 10px;
+}
+
+h3 {
+  font-size: 16px;
+  margin: 22px 0 6px;
+}
+
+p, li {
+  color: #24413c;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 0;
+}
+
+.card {
+  display: block;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin: 14px 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card:hover {
+  border-color: var(--teal);
+}
+
+.card strong {
+  display: block;
+  color: var(--teal);
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+
+.card span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.notice {
+  background: var(--teal-soft);
+  border-left: 4px solid var(--teal);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin: 20px 0;
+}
+
+.notice p {
+  margin: 0;
+}
+
+a {
+  color: var(--teal);
+}
+
+.button {
+  display: inline-block;
+  background: var(--teal);
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  margin: 8px 0;
+}
+
+footer.site {
+  border-top: 1px solid var(--line);
+  margin-top: 56px;
+  padding-top: 18px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+ol.steps li {
+  margin-bottom: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 20px;
+  font-size: 15px;
+}
+
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+th {
+  background: #eef6f4;
+}

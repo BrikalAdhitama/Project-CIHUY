@@ -1,0 +1,8 @@
+# Salin menjadi android/key.properties lalu isi dengan kredensial keystore
+# unggah milikmu. Berkas ini dan *.jks sudah diabaikan Git.
+#
+# storeFile relatif terhadap folder android/app/.
+storePassword=SANDI_KEYSTORE_KAMU
+keyPassword=SANDI_KEY_KAMU
+keyAlias=upload
+storeFile=upload-keystore.jks

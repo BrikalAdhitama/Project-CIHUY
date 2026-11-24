@@ -1,0 +1,21 @@
+CIHUY (Control It, Hold Yourself) membantu kamu mencatat kebiasaan merokok dan melihat perkembangannya dari hari ke hari.
+
+Mencatat saja tidak langsung mengubah kebiasaan, tetapi datanya membuat pola terlihat: kapan kamu paling sering merokok, apa pemicunya, dan seberapa sering kamu melewati target sendiri. CIHUY dibuat supaya pencatatan itu cepat—hanya beberapa ketukan—lalu menampilkannya kembali sebagai progres yang mudah dibaca.
+
+FITUR
+• Catat konsumsi rokok dalam satuan batang atau bungkus.
+• Catat keinginan merokok (craving) beserta pemicunya.
+• Atur target harian, bisa dijadwalkan untuk tanggal tertentu dan diubah kapan saja.
+• Statistik dan kalender untuk melihat hari yang sesuai target dan hari yang melebihi.
+• Pengingat lokal yang bisa diatur sesuai jadwalmu.
+• Ekspor laporan data untuk disimpan atau dibagikan sendiri.
+• Tanpa iklan, tanpa analytics, dan tanpa pelacakan pihak ketiga.
+
+PRIVASI
+Catatan konsumsi, craving, dan target harian disimpan di perangkatmu, bukan di server. Akun (email, nama, dan foto profil) hanya dipakai untuk masuk dan menampilkan profil. Kamu dapat menghapus akun beserta data profil langsung dari menu Pengaturan, atau melalui halaman permintaan penghapusan akun.
+
+CATATAN PENTING
+CIHUY adalah alat bantu pencatatan dan pemantauan diri, bukan layanan medis. Aplikasi ini tidak menggantikan konsultasi, diagnosis, atau pengobatan dari tenaga kesehatan. Jika kamu mengalami gejala yang mengganggu, hubungi dokter atau layanan kesehatan terdekat.
+
+Kontak: 11231017@student.itk.ac.id
+Kebijakan privasi: https://brikaladhitama.github.io/cihuy-legal/privacy.html

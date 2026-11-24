@@ -32,8 +32,16 @@ class ProgressCalculator {
       return DayStatus.unassessed;
     }
     final active = Habit.values.where((habit) => targetOn(day, habit) != null);
-    if (active.isEmpty) return DayStatus.unassessed;
     if (active.any((habit) => exceeds(day, habit))) return DayStatus.exceeded;
+    if (active.isEmpty) {
+      // Belum ada target pada hari itu (mis. target pertama baru dibuat
+      // setelah pengguna berhenti). Hari yang sudah lewat tetap dianggap
+      // berhasil bila tidak ada konsumsi sama sekali; hari ini belum selesai
+      // dan hari dengan konsumsi tanpa target tidak dapat dinilai.
+      if (sameDay(day, now)) return DayStatus.unassessed;
+      final consumed = Habit.values.any((habit) => total(day, habit) > 0);
+      return consumed ? DayStatus.unassessed : DayStatus.achieved;
+    }
     return sameDay(day, now) ? DayStatus.inProgress : DayStatus.achieved;
   }
 

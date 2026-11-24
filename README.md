@@ -2,14 +2,14 @@
 
 **CIHUY — Control It, Hold Yourself**
 
-Aplikasi Android berbasis Flutter untuk membantu pengguna mencatat konsumsi rokok/vape, menghadapi craving, dan memantau target harian.
+Aplikasi Android berbasis Flutter untuk membantu pengguna mencatat konsumsi rokok per batang atau per bungkus, menghadapi craving, dan memantau target harian.
 
-Saat ini repository berisi **frontend dengan data mock**. Backend dan penyimpanan permanen akan ditambahkan pada tahap berikutnya.
+Repository berisi aplikasi Flutter dan backend notifikasi terpisah. Tracking tetap mengikuti penyimpanan frontend yang ada; backend notifikasi tidak menyimpan catatan konsumsi.
 
 ## Struktur
 
 - `frontend_cihuy/`: aplikasi Flutter, aset, pengujian, dan konfigurasi Android.
-- Backend akan ditambahkan ke `backend_cihuy/` setelah siap. Folder lokal tersebut sementara diabaikan Git.
+- `backend_cihuy/`: API notifikasi Node.js, Firebase Auth/FCM, SQLite, scheduler, dan pengujian.
 
 ## Menjalankan frontend
 
@@ -29,3 +29,18 @@ flutter test
 ```
 
 Lihat [dokumentasi frontend](frontend_cihuy/README.md) dan [catatan verifikasi](frontend_cihuy/VERIFICATION.md) untuk fitur, aturan progres, serta batas mode mock.
+
+## Menjalankan backend notifikasi
+
+Diperlukan Node.js 24+. Lihat [panduan notifikasi](backend_cihuy/README.md) untuk konfigurasi Firebase, `.env`, HTTPS, pengujian perangkat, dan penjadwalan setiap menit.
+
+```sh
+cd backend_cihuy
+npm ci
+# Salin .env.example menjadi .env lalu isi konfigurasi backend.
+npm start
+# Jalankan per menit melalui scheduler, di proses terpisah:
+npm run dispatch
+```
+
+Pengingat lokal tetap tersedia tanpa kredensial Firebase. Atur melalui Profil > Notifikasi. Secret pengiriman hanya disimpan di backend.

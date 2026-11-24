@@ -64,44 +64,54 @@ void main() {
     authRepository: repository ?? LocalAuthRepository(),
   );
 
-  Future<void> registered(LocalAuthRepository repository) => repository.register(
-    name: 'Sari Rahayu',
-    email: 'sari@contoh.test',
-    password: 'kata-sandi-aman',
+  Future<void> registered(LocalAuthRepository repository) =>
+      repository.register(
+        name: 'Sari Rahayu',
+        email: 'sari@contoh.test',
+        password: 'kata-sandi-aman',
+      );
+
+  test(
+    'cold start tanpa sesi tetap di halaman masuk tanpa data demo',
+    () async {
+      final state = appState();
+      await state.initializeAuth();
+      expect(state.signedIn, isFalse);
+      expect(state.recordCount, 0);
+      expect(state.targets, isEmpty);
+    },
   );
 
-  test('cold start tanpa sesi tetap di halaman masuk tanpa data demo', () async {
-    final state = appState();
-    await state.initializeAuth();
-    expect(state.signedIn, isFalse);
-    expect(state.recordCount, 0);
-    expect(state.targets, isEmpty);
-  });
+  test(
+    'cold start dengan sesi memulihkan akun terdaftar tanpa data demo',
+    () async {
+      final repo = LocalAuthRepository();
+      await registered(repo);
+      final state = appState(repository: repo);
+      await state.initializeAuth();
+      expect(state.signedIn, isTrue);
+      expect(state.profile.name, 'Sari Rahayu');
+      expect(state.profile.email, 'sari@contoh.test');
+      expect(state.recordCount, 0);
+      expect(state.targets, isEmpty);
+    },
+  );
 
-  test('cold start dengan sesi memulihkan akun terdaftar tanpa data demo', () async {
-    final repo = LocalAuthRepository();
-    await registered(repo);
-    final state = appState(repository: repo);
-    await state.initializeAuth();
-    expect(state.signedIn, isTrue);
-    expect(state.profile.name, 'Sari Rahayu');
-    expect(state.profile.email, 'sari@contoh.test');
-    expect(state.recordCount, 0);
-    expect(state.targets, isEmpty);
-  });
-
-  test('logout menghapus sesi; cold start berikutnya di halaman masuk', () async {
-    final repo = LocalAuthRepository();
-    await registered(repo);
-    final state = appState(repository: repo);
-    await state.initializeAuth();
-    expect(state.signedIn, isTrue);
-    state.signOut();
-    final next = appState(repository: repo);
-    await next.initializeAuth();
-    expect(next.signedIn, isFalse);
-    expect(next.profile.name, isNot('Sari Rahayu'));
-  });
+  test(
+    'logout menghapus sesi; cold start berikutnya di halaman masuk',
+    () async {
+      final repo = LocalAuthRepository();
+      await registered(repo);
+      final state = appState(repository: repo);
+      await state.initializeAuth();
+      expect(state.signedIn, isTrue);
+      state.signOut();
+      final next = appState(repository: repo);
+      await next.initializeAuth();
+      expect(next.signedIn, isFalse);
+      expect(next.profile.name, isNot('Sari Rahayu'));
+    },
+  );
 
   test('masuk dari store demo tidak membocorkan data demo ke akun', () async {
     final repo = LocalAuthRepository();
@@ -110,6 +120,8 @@ void main() {
     final state = appState(repository: repo);
     state.startDemo();
     expect(state.recordCount, greaterThan(0));
+    // Login hanya tersedia setelah keluar dari sesi demo, seperti alur UI.
+    await state.signOut();
     await state.authenticate(email: email, password: 'kata-sandi-aman');
     expect(state.signedIn, isTrue);
     expect(state.profile.email, email);

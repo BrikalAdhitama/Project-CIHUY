@@ -76,4 +76,22 @@ class MockStore {
   final List<DailyTarget> targets = [];
   int _sequence = 0;
   String nextId() => 'mock-${++_sequence}';
+
+  /// Menyelaraskan urutan ID dengan catatan yang dipulihkan dari
+  /// penyimpanan agar ID baru tidak bertabrakan dengan ID lama.
+  void adoptExistingIds() {
+    var highest = _sequence;
+    final pattern = RegExp(r'^mock-(\d+)$');
+    for (final id in [
+      ...consumption.map((entry) => entry.id),
+      ...cravings.map((entry) => entry.id),
+      ...targets.map((entry) => entry.id),
+    ]) {
+      final match = pattern.firstMatch(id);
+      if (match == null) continue;
+      final value = int.tryParse(match.group(1)!);
+      if (value != null && value > highest) highest = value;
+    }
+    _sequence = highest;
+  }
 }

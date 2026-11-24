@@ -1,0 +1,32 @@
+{
+  "confirm-signup.html": {
+    "dashboard_template": "Confirm sign up",
+    "subject": "Kode verifikasi pendaftaran CIHUY",
+    "mode": "otp"
+  },
+  "invite-user.html": {
+    "dashboard_template": "Invite user",
+    "subject": "Undangan bergabung ke CIHUY",
+    "mode": "confirmation_link"
+  },
+  "magic-link-or-otp.html": {
+    "dashboard_template": "Magic link or OTP",
+    "subject": "Kode masuk ke akun CIHUY",
+    "mode": "otp"
+  },
+  "change-email-address.html": {
+    "dashboard_template": "Change email address",
+    "subject": "Konfirmasi perubahan email CIHUY",
+    "mode": "confirmation_link"
+  },
+  "reset-password.html": {
+    "dashboard_template": "Reset password",
+    "subject": "Atur ulang kata sandi CIHUY",
+    "mode": "confirmation_link"
+  },
+  "reauthentication.html": {
+    "dashboard_template": "Reauthentication",
+    "subject": "Kode konfirmasi keamanan CIHUY",
+    "mode": "otp"
+  }
+}

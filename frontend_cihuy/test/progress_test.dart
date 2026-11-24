@@ -263,8 +263,25 @@ void main() {
     expect(state.recordCount, 0);
   });
 
+  test('past days without a target succeed only when nothing was consumed', () {
+    final noTarget = AppState(
+      clock: () => now,
+      store: MockStore.empty(DateTime(2026, 9, 5)),
+      autoTick: false,
+    );
+    try {
+      expect(noTarget.progress.status(seventh, now), DayStatus.achieved);
+      expect(noTarget.progress.currentStreak(now), 7);
+      expect(noTarget.progress.status(now, now), DayStatus.unassessed);
+      noTarget.saveConsumption(habit: Habit.cigarette, amount: 1, at: seventh);
+      expect(noTarget.progress.status(seventh, now), DayStatus.unassessed);
+    } finally {
+      noTarget.dispose();
+    }
+  });
+
   test(
-    'demo has 27 cigarettes, 34 entries, five completed successes and streak four',
+    'demo has 27 cigarettes, 34 entries, six completed successes and streak four',
     () {
       state.startDemo();
       expect(
@@ -272,7 +289,7 @@ void main() {
         27,
       );
       expect(state.progress.total(seventh, Habit.cigarette), 6);
-      expect(state.progress.successfulDays(now), 5);
+      expect(state.progress.successfulDays(now), 6);
       expect(state.progress.currentStreak(now), 4);
       expect(state.progress.bestStreak(now), 4);
       expect(state.recordCount, 34);

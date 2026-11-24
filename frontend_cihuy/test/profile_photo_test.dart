@@ -119,16 +119,14 @@ void main() {
     await state.changeProfilePhoto();
     await mountProfile(tester);
     picker.pick = () async =>
-        throw PlatformException(code: 'photo_access_denied');
+        throw PlatformException(code: 'gallery_unavailable');
 
     await choosePhoto(tester);
 
     expect(state.profile.photo, orderedEquals(photo));
     expect(find.byKey(const Key('profile-photo')), findsOneWidget);
     expect(
-      find.text(
-        'Akses foto ditolak. Izinkan akses foto di pengaturan aplikasi lalu coba lagi.',
-      ),
+      find.text('Galeri tidak dapat dibuka. Coba pilih foto lagi.'),
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);

@@ -75,46 +75,49 @@ void main() {
       );
 
   group('baseline rata-rata konsumsi awal', () {
-    test('disimpan dari onboarding, diperbarui, dan terisolasi per akun', () async {
-      final repo = LocalAuthRepository();
-      await repo.register(
-        name: 'Sari Rahayu',
-        email: 'sari@contoh.test',
-        password: 'kata-sandi-aman',
-      );
-      final state = appState(repository: repo);
-      await state.initializeAuth();
-      state.completeOnboarding(
-        'Ingin sehat',
-        baselineHabit: Habit.cigarette,
-        baselineValue: 12,
-      );
-      expect(state.baseline(Habit.cigarette), 12);
-      expect(state.baseline(Habit.vape), isNull);
+    test(
+      'disimpan dari onboarding, diperbarui, dan terisolasi per akun',
+      () async {
+        final repo = LocalAuthRepository();
+        await repo.register(
+          name: 'Sari Rahayu',
+          email: 'sari@contoh.test',
+          password: 'kata-sandi-aman',
+        );
+        final state = appState(repository: repo);
+        await state.initializeAuth();
+        state.completeOnboarding(
+          'Ingin sehat',
+          baselineHabit: Habit.cigarette,
+          baselineValue: 12,
+        );
+        expect(state.baseline(Habit.cigarette), 12);
+        expect(state.baseline(Habit.vape), isNull);
 
-      // Persisten lintas instance (akun dibaca ulang dari penyimpanan).
-      final loaded = await LocalAuthRepository().currentAccount();
-      expect(loaded?.baselineCigarette, 12);
+        // Persisten lintas instance (akun dibaca ulang dari penyimpanan).
+        final loaded = await LocalAuthRepository().currentAccount();
+        expect(loaded?.baselineCigarette, 12);
 
-      // Diperbarui dari profil tanpa menyentuh catatan historis.
-      final before = state.recordCount;
-      state.updateBaseline(Habit.vape, 40);
-      expect(state.baseline(Habit.vape), 40);
-      expect(state.recordCount, before);
-      final loaded2 = await LocalAuthRepository().currentAccount();
-      expect(loaded2?.baselineVape, 40);
+        // Diperbarui dari profil tanpa menyentuh catatan historis.
+        final before = state.recordCount;
+        state.updateBaseline(Habit.vape, 40);
+        expect(state.baseline(Habit.vape), 40);
+        expect(state.recordCount, before);
+        final loaded2 = await LocalAuthRepository().currentAccount();
+        expect(loaded2?.baselineVape, 40);
 
-      // Akun kedua tidak mewarisi baseline akun pertama.
-      final repo2 = LocalAuthRepository();
-      await repo2.register(
-        name: 'Budi',
-        email: 'budi@contoh.test',
-        password: 'kata-sandi-aman',
-      );
-      final state2 = appState(repository: repo2);
-      await state2.initializeAuth();
-      expect(state2.baseline(Habit.cigarette), isNull);
-    });
+        // Akun kedua tidak mewarisi baseline akun pertama.
+        final repo2 = LocalAuthRepository();
+        await repo2.register(
+          name: 'Budi',
+          email: 'budi@contoh.test',
+          password: 'kata-sandi-aman',
+        );
+        final state2 = appState(repository: repo2);
+        await state2.initializeAuth();
+        expect(state2.baseline(Habit.cigarette), isNull);
+      },
+    );
   });
 
   group('hapus akun terdaftar', () {
@@ -131,7 +134,10 @@ void main() {
         password: 'kata-sandi-aman',
       );
       final state = appState(repository: repo);
-      await state.authenticate(email: 'sari@contoh.test', password: 'kata-sandi-aman');
+      await state.authenticate(
+        email: 'sari@contoh.test',
+        password: 'kata-sandi-aman',
+      );
       expect(state.hasAccount, isTrue);
 
       await state.deleteAccount();
@@ -141,18 +147,12 @@ void main() {
       expect(session, isNull);
       // Akun tidak bisa dipakai masuk kembali.
       await expectLater(
-        repo.signIn(
-          email: 'sari@contoh.test',
-          password: 'kata-sandi-aman',
-        ),
+        repo.signIn(email: 'sari@contoh.test', password: 'kata-sandi-aman'),
         throwsA(isA<LocalAuthException>()),
       );
       // Akun lain di perangkat tetap dapat dipakai.
       await expectLater(
-        repo.signIn(
-          email: 'budi@contoh.test',
-          password: 'kata-sandi-aman',
-        ),
+        repo.signIn(email: 'budi@contoh.test', password: 'kata-sandi-aman'),
         completes,
       );
       // UI kembali ke halaman masuk dengan store kosong.
@@ -172,10 +172,7 @@ void main() {
         throwsA(const LocalAuthException('Akun lokal tidak ditemukan.')),
       );
       await expectLater(
-        repo.signIn(
-          email: 'budi@contoh.test',
-          password: 'kata-sandi-aman',
-        ),
+        repo.signIn(email: 'budi@contoh.test', password: 'kata-sandi-aman'),
         completes,
       );
     });
@@ -196,11 +193,7 @@ void main() {
 
     test('target yang sudah berjalan tidak boleh dihapus permanen', () {
       final state = appState();
-      state.setTarget(
-        habit: Habit.cigarette,
-        limit: 5,
-        startsOn: dayOnly(now),
-      );
+      state.setTarget(habit: Habit.cigarette, limit: 5, startsOn: dayOnly(now));
       final target = state.targets.last;
       expect(() => state.removeScheduledTarget(target), throwsArgumentError);
       expect(state.targets, isNotEmpty);

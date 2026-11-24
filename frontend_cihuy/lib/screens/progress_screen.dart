@@ -26,6 +26,14 @@ class ProgressScreen extends StatelessWidget {
     }
     final sorted = triggers.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
+    // Vape hanya ditampilkan bila memang ada data lama pada periode ini.
+    final habits = [
+      for (final habit in Habit.values)
+        if (!habit.isLegacy ||
+            state.progress.totalInRange(start, end, habit) > 0 ||
+            state.progress.totalInRange(previousStart, previousEnd, habit) > 0)
+          habit,
+    ];
     return Scaffold(
       appBar: AppBar(title: const Text('Detail progres')),
       body: SafeArea(
@@ -38,23 +46,29 @@ class ProgressScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 16),
-            for (final habit in Habit.values)
+            for (final habit in habits)
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: SurfaceCard(
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SectionTitle(habit.label),
+                      SectionTitle(habit.legacyLabel),
                       const SizedBox(height: 12),
                       Text(
-                        '${state.progress.totalInRange(start, end, habit)} ${habit.unit}',
+                        habit.isLegacy
+                            ? '${state.progress.totalInRange(start, end, habit)} ${habit.unit}'
+                            : cigaretteAmountLabel(
+                                state.progress.totalInRange(start, end, habit),
+                                state.sticksPerPack,
+                              ),
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       const SizedBox(height: 5),
                       Text(
                         '7 hari sebelumnya (${dateRange(previousStart, previousEnd)}): '
-                        '${state.progress.totalInRange(previousStart, previousEnd, habit)} ${habit.unit}',
+                        '${habit.isLegacy ? '${state.progress.totalInRange(previousStart, previousEnd, habit)} ${habit.unit}' : cigaretteAmountLabel(state.progress.totalInRange(previousStart, previousEnd, habit), state.sticksPerPack)}',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
@@ -63,6 +77,7 @@ class ProgressScreen extends StatelessWidget {
               ),
             SurfaceCard(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SectionTitle('Pola craving'),
@@ -79,6 +94,8 @@ class ProgressScreen extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Expanded(child: Text(entry.key)),
                           Text(
@@ -93,7 +110,7 @@ class ProgressScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             const Text(
-              'Hari ini baru dihitung sebagai hari berhasil setelah selesai. Rokok dan vape dihitung dengan satuan masing-masing.',
+              'Rokok dihitung per batang; jumlah bungkus dikonversi otomatis memakai isi per bungkus di Profil. Hari ini baru dihitung sebagai hari berhasil setelah selesai.',
               style: TextStyle(fontSize: 12, color: CihuyColors.muted),
             ),
           ],

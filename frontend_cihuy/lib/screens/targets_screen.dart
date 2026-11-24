@@ -19,7 +19,16 @@ class TargetsScreen extends StatelessWidget {
     final today = dayOnly(state.now);
     final current = state.targets
         .where(
-          (target) => target.endsOn == null || target.endsOn!.isAfter(today),
+          (target) =>
+              !target.habit.isLegacy &&
+              (target.endsOn == null || target.endsOn!.isAfter(today)),
+        )
+        .toList();
+    final legacy = state.targets
+        .where(
+          (target) =>
+              target.habit.isLegacy &&
+              (target.endsOn == null || target.endsOn!.isAfter(today)),
         )
         .toList();
     final history =
@@ -43,7 +52,7 @@ class TargetsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             const Text(
-              'Atur batas rokok dan vape secara terpisah. Setiap perubahan memiliki tanggal berlaku; target masa lalu tetap tersimpan.',
+              'Atur batas rokok harian dalam batang atau bungkus. Setiap perubahan memiliki tanggal berlaku; target masa lalu tetap tersimpan.',
               style: TextStyle(color: CihuyColors.muted),
             ),
             const SizedBox(height: 20),
@@ -69,6 +78,21 @@ class TargetsScreen extends StatelessWidget {
               icon: const Icon(Icons.add, size: 18),
               label: const Text('Tambah target'),
             ),
+            if (legacy.isNotEmpty) ...[
+              const SizedBox(height: 28),
+              const SectionTitle('Target vape lama'),
+              const SizedBox(height: 6),
+              const Text(
+                'Vape tidak lagi tersedia untuk catatan baru. Target lama tetap dipakai untuk statistik historis; nonaktifkan bila sudah tidak dipakai.',
+                style: TextStyle(fontSize: 12, color: CihuyColors.muted),
+              ),
+              const SizedBox(height: 12),
+              for (final target in legacy)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _TargetCard(target: target, legacy: true),
+                ),
+            ],
             const SizedBox(height: 28),
             const SectionTitle('Riwayat target'),
             const SizedBox(height: 12),
@@ -81,7 +105,7 @@ class TargetsScreen extends StatelessWidget {
               ),
             const SizedBox(height: 12),
             const Text(
-              'Jika kedua jenis memiliki target, satu hari berhasil ketika kedua batas terpenuhi. Hari mendatang dan hari ini yang belum selesai belum dihitung sebagai keberhasilan.',
+              'Satu hari dihitung berhasil ketika konsumsi tidak melewati batas yang berlaku. Hari ini dan hari mendatang belum dihitung sebagai keberhasilan.',
               style: TextStyle(fontSize: 12, color: CihuyColors.muted),
             ),
           ],
@@ -92,15 +116,25 @@ class TargetsScreen extends StatelessWidget {
 }
 
 class _TargetCard extends StatelessWidget {
-  const _TargetCard({required this.target, this.history = false});
+  const _TargetCard({
+    required this.target,
+    this.history = false,
+    this.legacy = false,
+  });
   final DailyTarget target;
   final bool history;
+  final bool legacy;
 
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
     final today = dayOnly(state.now);
+    final tomorrow = shiftDay(today, 1);
+    final scheduled = target.startsOn.isAfter(today);
     final replaced = target.endsOn == target.startsOn;
+    final limitLabel = target.habit.isLegacy
+        ? '${target.limit} ${target.habit.unit} per hari'
+        : '${cigaretteAmountLabel(target.limit, state.sticksPerPack)} per hari';
     final effective = replaced
         ? 'Digantikan sebelum berlaku'
         : '${shortDate(target.startsOn)} – ${target.endsOn == null ? 'seterusnya' : shortDate(shiftDay(target.endsOn!, -1))}';
@@ -108,13 +142,11 @@ class _TargetCard extends StatelessWidget {
       onTap: () => openSheet(
         context,
         Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SheetHeading('Target ${target.habit.label}'),
-            Text(
-              '${target.limit} ${target.habit.unit} per hari',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            SheetHeading('Target ${target.habit.legacyLabel}'),
+            Text(limitLabel, style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 12),
             Text('Periode: $effective'),
             const SizedBox(height: 16),
@@ -158,22 +190,26 @@ class _TargetCard extends StatelessWidget {
         ),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               IconTile.child(habitIcon(target.habit)),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      target.habit.label,
+                      target.habit.legacyLabel,
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     Text(
-                      '${target.limit} ${target.habit.unit} per hari',
+                      limitLabel,
                       style: const TextStyle(color: CihuyColors.muted),
                     ),
                   ],
@@ -182,9 +218,11 @@ class _TargetCard extends StatelessWidget {
               Text(
                 history
                     ? 'Selesai'
-                    : target.startsOn.isAfter(today)
+                    : scheduled
                     ? 'Terjadwal'
-                    : 'Aktif',
+                    : target.endsOn == null
+                    ? 'Aktif'
+                    : 'Berakhir',
                 style: TextStyle(
                   fontSize: 11,
                   color: history ? CihuyColors.muted : CihuyColors.tealInk,
@@ -196,40 +234,62 @@ class _TargetCard extends StatelessWidget {
           Text(effective, style: Theme.of(context).textTheme.bodySmall),
           if (!history) ...[
             const SizedBox(height: 6),
-            Row(
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 4,
               children: [
-                TextButton(
-                  onPressed: () =>
-                      openSheet(context, TargetForm(target: target)),
-                  child: const Text('Edit target'),
-                ),
-                const Spacer(),
-                TextButton(
-                  onPressed: () async {
-                    final tomorrow = shiftDay(today, 1);
-                    final end = target.startsOn.isAfter(tomorrow)
-                        ? target.startsOn
-                        : tomorrow;
-                    final confirm = await confirmAction(
-                      context,
-                      title: 'Nonaktifkan target?',
-                      message:
-                          'Target ${target.habit.label} tidak berlaku mulai ${shortDate(end)}. Periode sebelumnya tetap ada dalam riwayat.',
-                      confirm: 'Nonaktifkan',
-                    );
-                    if (confirm && context.mounted) {
-                      state.deactivateTarget(target, end);
-                      showMessage(
-                        context,
-                        'Target dinonaktifkan mulai ${shortDate(end)}.',
-                      );
-                    }
-                  },
-                  child: const Text(
-                    'Nonaktifkan',
-                    style: TextStyle(color: CihuyColors.red),
+                if (!legacy)
+                  TextButton(
+                    onPressed: () =>
+                        openSheet(context, TargetForm(target: target)),
+                    child: Text(scheduled ? 'Edit jadwal' : 'Edit target'),
                   ),
-                ),
+                if (scheduled)
+                  TextButton(
+                    onPressed: () async {
+                      final confirm = await confirmAction(
+                        context,
+                        title: 'Batalkan jadwal?',
+                        message:
+                            'Target ${target.habit.legacyLabel} yang dijadwalkan mulai ${shortDate(target.startsOn)} dihapus permanen. Target sebelumnya kembali berlaku bila ada.',
+                        confirm: 'Batalkan',
+                      );
+                      if (confirm && context.mounted) {
+                        state.removeScheduledTarget(target);
+                        showMessage(context, 'Jadwal target dibatalkan.');
+                      }
+                    },
+                    child: const Text(
+                      'Batalkan jadwal',
+                      style: TextStyle(color: CihuyColors.red),
+                    ),
+                  )
+                else if (target.endsOn == null ||
+                    target.endsOn!.isAfter(tomorrow))
+                  TextButton(
+                    onPressed: () async {
+                      final confirm = await confirmAction(
+                        context,
+                        title: 'Nonaktifkan target?',
+                        message:
+                            'Target ${target.habit.legacyLabel} tidak berlaku mulai ${shortDate(tomorrow)}. Hari sebelum tanggal itu tetap tersimpan dalam riwayat.',
+                        confirm: 'Nonaktifkan',
+                      );
+                      if (confirm && context.mounted) {
+                        state.deactivateTarget(target, tomorrow);
+                        showMessage(
+                          context,
+                          'Target dinonaktifkan mulai ${shortDate(tomorrow)}.',
+                        );
+                      }
+                    },
+                    child: const Text(
+                      'Nonaktifkan',
+                      style: TextStyle(color: CihuyColors.red),
+                    ),
+                  ),
               ],
             ),
           ],
@@ -253,23 +313,27 @@ class _TargetFormState extends State<TargetForm> {
   late DateTime _start;
   DateTime? _end;
   String? _error;
+
+  /// Batas diisi dalam bungkus? Nilai tetap disimpan dalam batang.
+  bool _usePacks = false;
+
   @override
   void initState() {
     super.initState();
     final state = context.read<AppState>();
     _habit = widget.target?.habit ?? Habit.cigarette;
     _limit = TextEditingController(text: '${widget.target?.limit ?? 5}');
-    final latest = state.targets
-        .where((target) => target.habit == _habit)
-        .map((target) => target.startsOn)
-        .fold(dayOnly(state.now), (a, b) => a.isAfter(b) ? a : b);
-    final proposed = widget.target == null
-        ? dayOnly(state.now)
-        : shiftDay(state.now, 1);
-    _start = latest.isAfter(proposed) ? latest : proposed;
+    final today = dayOnly(state.now);
+    // Target yang belum berjalan diedit pada tanggal mulainya; target yang
+    // sedang berjalan diedit mulai hari ini supaya hanya ada satu target aktif
+    // (periode sebelumnya pindah ke riwayat). Tanggal tidak digeser diam-diam
+    // ke jadwal lain; benturan jadwal dilaporkan saat menyimpan.
+    _start = widget.target == null || !widget.target!.startsOn.isAfter(today)
+        ? today
+        : widget.target!.startsOn;
     _end = widget.target?.endsOn == null
-      ? null
-      : shiftDay(widget.target!.endsOn!, -1);
+        ? null
+        : shiftDay(widget.target!.endsOn!, -1);
   }
 
   @override
@@ -278,41 +342,100 @@ class _TargetFormState extends State<TargetForm> {
     super.dispose();
   }
 
+  int get _sticksPerPack => context.read<AppState>().sticksPerPack;
+  int get _entered => int.tryParse(_limit.text.trim()) ?? 0;
+
+  /// Nilai batang yang akan disimpan; bungkus hanya satuan masukan.
+  int get _total => _usePacks ? _entered * _sticksPerPack : _entered;
+
+  String get _unitLabel => _usePacks ? 'bungkus' : _habit.unit;
+
+  void _setUnit(bool packs) {
+    if (packs == _usePacks) return;
+    setState(() {
+      _usePacks = packs;
+      // Angka lama tidak dikonversi diam-diam agar nilainya tidak berubah
+      // berkali-kali lipat; pengguna melihat padanan batang di bawah kolom.
+      _limit.text = '1';
+      _error = null;
+    });
+  }
+
+  String get _limitHelper {
+    if (_habit.isLegacy) return 'Batas 0 berarti berhenti sepenuhnya.';
+    if (_usePacks) {
+      return '= $_total batang per hari · 0 berarti berhenti sepenuhnya.';
+    }
+    return '${cigaretteAmountLabel(_total, _sticksPerPack)} per hari · '
+        '0 berarti berhenti sepenuhnya.';
+  }
+
   @override
   Widget build(BuildContext context) => Form(
     key: _form,
     child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SheetHeading(
           widget.target == null ? 'Tambah target harian' : 'Edit target harian',
           subtitle: 'Perubahan disimpan sebagai periode baru.',
         ),
-        const FieldLabel('Jenis kebiasaan'),
-        if (widget.target == null)
-          HabitSelector(
-            value: _habit,
-            onChanged: (habit) => setState(() => _habit = habit),
-          )
-        else
+        if (_habit.isLegacy) ...[
           Text(
-            _habit.label,
+            'Target vape (lama)',
             style: const TextStyle(fontWeight: FontWeight.w600),
           ),
-        const SizedBox(height: 18),
-        FieldLabel('Batas harian (${_habit.unit})'),
+          const SizedBox(height: 18),
+        ],
+        if (!_habit.isLegacy) ...[
+          const FieldLabel('Satuan'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: ChoiceButton(
+                  selected: !_usePacks,
+                  label: 'Batang',
+                  icon: habitIcon(Habit.cigarette),
+                  onTap: () => _setUnit(false),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ChoiceButton(
+                  selected: _usePacks,
+                  label: 'Bungkus',
+                  icon: const Icon(Icons.inventory_2_outlined),
+                  onTap: () => _setUnit(true),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '1 bungkus = $_sticksPerPack batang. Isi per bungkus bisa diubah di Profil.',
+            style: const TextStyle(fontSize: 11, color: CihuyColors.muted),
+          ),
+          const SizedBox(height: 16),
+        ],
+        FieldLabel('Batas harian ($_unitLabel)'),
         TextFormField(
           key: const Key('target-limit'),
           controller: _limit,
           keyboardType: TextInputType.number,
+          onChanged: (_) => setState(() {}),
           decoration: InputDecoration(
-            suffixText: _habit.unit,
-            helperText: 'Batas 0 berarti berhenti sepenuhnya.',
+            suffixText: _unitLabel,
+            helperText: _limitHelper,
           ),
-          validator: (value) =>
-              int.tryParse(value ?? '') == null || int.parse(value!) < 0
-              ? 'Isi bilangan bulat 0 atau lebih'
-              : null,
+          validator: (value) {
+            final amount = int.tryParse((value ?? '').trim());
+            return amount == null || amount < 0
+                ? 'Isi bilangan bulat 0 atau lebih'
+                : null;
+          },
         ),
         const SizedBox(height: 18),
         const FieldLabel('Berlaku mulai'),
@@ -323,11 +446,20 @@ class _TargetFormState extends State<TargetForm> {
               context: context,
               initialDate: _start,
               firstDate: dayOnly(now),
-              lastDate: DateTime(now.year + 5),
+              lastDate: DateTime(now.year + 5, 12, 31),
             );
-            if (date != null) setState(() => _start = date);
+            if (date != null) {
+              setState(() {
+                _start = date;
+                // Tanggal selesai yang jadi lebih awal dari tanggal mulai
+                // dibuang agar tidak menyisakan kombinasi yang tidak valid.
+                if (_end != null && !_end!.isAfter(_start)) _end = null;
+              });
+            }
           },
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(child: Text(shortDate(_start))),
               const Icon(Icons.calendar_today_outlined, size: 17),
@@ -337,20 +469,27 @@ class _TargetFormState extends State<TargetForm> {
         const SizedBox(height: 18),
         const FieldLabel('Berlaku sampai (opsional)'),
         Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: OutlinedButton(
                 onPressed: () async {
                   final now = context.read<AppState>().now;
+                  final first = shiftDay(_start, 1);
                   final date = await showDatePicker(
                     context: context,
-                    initialDate: _end ?? _start,
-                    firstDate: _start,
-                    lastDate: DateTime(now.year + 5),
+                    initialDate: _end == null || !_end!.isAfter(_start)
+                        ? first
+                        : _end!,
+                    firstDate: first,
+                    lastDate: DateTime(now.year + 6, 12, 31),
                   );
                   if (date != null) setState(() => _end = date);
                 },
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
                       child: Text(
@@ -389,7 +528,7 @@ class _TargetFormState extends State<TargetForm> {
             try {
               context.read<AppState>().setTarget(
                 habit: _habit,
-                limit: int.parse(_limit.text),
+                limit: _total,
                 startsOn: _start,
                 endsOn: _end == null ? null : shiftDay(_end!, 1),
               );

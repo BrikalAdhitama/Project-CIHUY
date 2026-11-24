@@ -1,7 +1,7 @@
 name: cihuy
-description: "CIHUY — Control It, Hold Yourself. Demo Flutter Android tanpa backend."
+description: "CIHUY — Control It, Hold Yourself. Pelacak konsumsi rokok dan vape dengan target harian."
 publish_to: 'none'
-version: 0.1.0
+version: 1.0.0+2
 
 environment:
   sdk: ^3.10.4
@@ -13,19 +13,30 @@ dependencies:
     sdk: flutter
   provider: ^6.1.5
   intl: ^0.20.2
-  image_picker: ^1.2.3
-  flutter_svg: ^2.3.0
-  image_cropper: ^12.2.1
-  crypto: ^3.0.6
-  flutter_secure_storage: ^9.2.4
+  image_picker: ^1.2.4
+  flutter_svg: ^2.4.0
+  image_cropper: ^13.0.0
+  crypto: ^3.0.8
+  flutter_secure_storage: ^11.2.0
   shared_preferences: ^2.5.3
+  http: ^1.6.0
+  firebase_auth: ^7.1.0
+  firebase_core: ^5.2.0
+  firebase_messaging: ^17.1.0
+  flutter_local_notifications: ^23.0.2
+  timezone: ^0.11.2
+  flutter_timezone: ^5.0.1
+  supabase_flutter: ^2.18.3
+  google_sign_in: ^7.2.0
+  package_info_plus: ^10.2.2
+  url_launcher: ^6.3.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
-  flutter_secure_storage_platform_interface: ^1.1.2
+  flutter_secure_storage_platform_interface: ^2.1.1
   shared_preferences_platform_interface: ^2.4.2
 
 flutter_launcher_icons:

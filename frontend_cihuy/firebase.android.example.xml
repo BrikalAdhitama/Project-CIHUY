@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copy to android/app/src/main/res/values/firebase_local.xml and fill using
+     the SAME Firebase app as firebase.local.json. These are client identifiers,
+     never service-account credentials. Required for native cold-start FCM. -->
+<resources>
+    <string name="google_app_id" translatable="false"></string>
+    <string name="google_api_key" translatable="false"></string>
+    <string name="gcm_defaultSenderId" translatable="false"></string>
+    <string name="project_id" translatable="false"></string>
+</resources>

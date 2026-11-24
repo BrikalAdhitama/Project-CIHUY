@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_state.dart';
+import 'providers/notification_controller.dart';
 import 'screens/auth_screen.dart';
+import 'screens/signup_otp_screen.dart';
 import 'screens/calendar_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/profile_screen.dart';
@@ -19,28 +21,45 @@ class CihuyApp extends StatefulWidget {
   State<CihuyApp> createState() => _CihuyAppState();
 }
 
-class _CihuyAppState extends State<CihuyApp> {
+class _CihuyAppState extends State<CihuyApp> with WidgetsBindingObserver {
   late final AppState _state = widget.state ?? AppState(startSignedIn: false);
+  late final NotificationController _notifications = NotificationController(
+    _state,
+  );
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (widget.state == null &&
         !kIsWeb &&
         defaultTargetPlatform == TargetPlatform.android) {
       unawaited(_state.initializePhotoPicker());
     }
     if (widget.state == null) unawaited(_state.initializeAuth());
+    if (widget.state == null) unawaited(_notifications.initialize());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && widget.state == null) {
+      unawaited(_notifications.refresh());
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _notifications.dispose();
     if (widget.state == null) _state.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider.value(
-    value: _state,
+  Widget build(BuildContext context) => MultiProvider(
+    providers: [
+      ChangeNotifierProvider.value(value: _state),
+      ChangeNotifierProvider.value(value: _notifications),
+    ],
     child: MaterialApp(
       title: 'CIHUY',
       debugShowCheckedModeBanner: false,
@@ -49,8 +68,10 @@ class _CihuyAppState extends State<CihuyApp> {
       supportedLocales: const [Locale('id', 'ID')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       home: Consumer<AppState>(
-        builder: (context, state, _) => state.authLoading
+        builder: (context, state, _) => state.authInitializing
             ? const _AuthLoadingScreen()
+            : state.pendingSignupEmail != null && !state.signedIn
+            ? const SignupOtpScreen()
             : !state.signedIn
             ? const AuthScreen()
             : state.needsOnboarding

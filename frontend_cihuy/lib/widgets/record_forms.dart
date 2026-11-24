@@ -20,6 +20,8 @@ Future<void> showRecordChooser(BuildContext context) async {
           borderRadius: BorderRadius.circular(17),
           clipBehavior: Clip.antiAlias,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               const Padding(
@@ -41,7 +43,7 @@ Future<void> showRecordChooser(BuildContext context) async {
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                 ),
                 subtitle: const Text(
-                  'Rokok atau vape yang baru dikonsumsi',
+                  'Rokok yang baru dikonsumsi',
                   style: TextStyle(fontSize: 12, color: CihuyColors.muted),
                 ),
                 onTap: () => Navigator.pop(context, 0),
@@ -121,11 +123,14 @@ Future<void> showConsumptionForm(
     ),
   );
   if (context.mounted && result != null) {
+    final amount = result.habit.isLegacy
+        ? '${result.amount} ${result.habit.unit}'
+        : cigaretteAmountLabel(result.amount, state.sticksPerPack);
     showMessage(
       context,
       entry == null
-          ? 'Catatan konsumsi disimpan.'
-          : 'Catatan konsumsi diperbarui.',
+          ? 'Catatan konsumsi disimpan: $amount.'
+          : 'Catatan konsumsi diperbarui: $amount.',
     );
   }
 }
@@ -153,7 +158,7 @@ Future<void> showCravingForm(
       context,
       title: 'Catat konsumsinya juga?',
       message:
-          'Craving sudah disimpan. Jika kamu mengonsumsi rokok atau vape, catat jumlahnya agar progres tetap akurat.',
+          'Craving sudah disimpan. Jika kamu mengonsumsi rokok, catat jumlahnya agar progres tetap akurat.',
       confirm: 'Catat konsumsi',
       destructive: false,
     );
@@ -175,10 +180,12 @@ class DateTimeFields extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = context.read<AppState>().now;
     return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const FieldLabel('Tanggal'),
@@ -204,6 +211,7 @@ class DateTimeFields extends StatelessWidget {
                   }
                 },
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Flexible(
@@ -226,6 +234,7 @@ class DateTimeFields extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const FieldLabel('Waktu'),
@@ -255,6 +264,7 @@ class DateTimeFields extends StatelessWidget {
                   }
                 },
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
@@ -296,6 +306,7 @@ class _ConsumptionFormState extends State<ConsumptionForm> {
   late final TextEditingController _amount;
   late final TextEditingController _note;
   late Habit _habit;
+  bool _usePacks = false;
   late DateTime _at;
   String? _error;
   @override
@@ -314,13 +325,33 @@ class _ConsumptionFormState extends State<ConsumptionForm> {
     super.dispose();
   }
 
+  int get _sticksPerPack => context.read<AppState>().sticksPerPack;
+
+  int get _entered => int.tryParse(_amount.text) ?? 0;
+
+  /// Semua jumlah disimpan dalam batang agar target dan statistik konsisten.
+  int get _total => _usePacks ? _entered * _sticksPerPack : _entered;
+
+  String get _unitLabel => _usePacks ? 'bungkus' : _habit.unit;
+
+  void _setUnit(bool packs) {
+    if (packs == _usePacks) return;
+    setState(() {
+      _usePacks = packs;
+      // Jangan mengonversi angka yang sudah diketik secara diam-diam: nilai
+      // lama bisa berubah 12 kali lipat tanpa disadari.
+      _amount.text = '1';
+      _error = null;
+    });
+  }
+
   void _save() {
     if (!_form.currentState!.validate()) return;
     try {
       final result = context.read<AppState>().saveConsumption(
         id: widget.entry?.id,
         habit: _habit,
-        amount: int.parse(_amount.text),
+        amount: _total,
         at: _at,
         note: _note.text,
       );
@@ -334,6 +365,7 @@ class _ConsumptionFormState extends State<ConsumptionForm> {
   Widget build(BuildContext context) => Form(
     key: _form,
     child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -341,14 +373,53 @@ class _ConsumptionFormState extends State<ConsumptionForm> {
           widget.entry == null ? 'Catat Konsumsi' : 'Edit Konsumsi',
           subtitle: 'Catat setiap konsumsi secara jujur untuk hasil terbaik',
         ),
-        const FieldLabel('Jenis konsumsi'),
-        HabitSelector(
-          value: _habit,
-          onChanged: (value) => setState(() => _habit = value),
-        ),
-        const SizedBox(height: 18),
-        FieldLabel('Jumlah (${_habit.unit})'),
+        if (_habit.isLegacy) ...[
+          const FieldLabel('Satuan'),
+          const Text(
+            'Hisapan · catatan vape lama',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Vape tidak lagi bisa dicatat. Catatan lama tetap bisa diperbaiki atau dihapus.',
+            style: TextStyle(fontSize: 11, color: CihuyColors.muted),
+          ),
+          const SizedBox(height: 16),
+        ] else ...[
+          const FieldLabel('Satuan'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: ChoiceButton(
+                  selected: !_usePacks,
+                  label: 'Batang',
+                  icon: habitIcon(Habit.cigarette),
+                  onTap: () => _setUnit(false),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ChoiceButton(
+                  selected: _usePacks,
+                  label: 'Bungkus',
+                  icon: const Icon(Icons.inventory_2_outlined),
+                  onTap: () => _setUnit(true),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '1 bungkus = $_sticksPerPack batang. Isi per bungkus bisa diubah di Profil.',
+            style: const TextStyle(fontSize: 11, color: CihuyColors.muted),
+          ),
+          const SizedBox(height: 16),
+        ],
+        FieldLabel('Jumlah ($_unitLabel)'),
         Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             IconButton.filledTonal(
@@ -371,11 +442,16 @@ class _ConsumptionFormState extends State<ConsumptionForm> {
                 onChanged: (_) => setState(() {}),
                 style: const TextStyle(fontSize: 20),
                 decoration: InputDecoration(
-                  suffixText: _habit.unit,
+                  suffixText: _unitLabel,
                   suffixStyle: const TextStyle(
                     fontSize: 13,
                     color: CihuyColors.muted,
                   ),
+                  helperText: _usePacks
+                      ? '= $_total batang'
+                      : _habit.isLegacy
+                      ? null
+                      : cigaretteAmountLabel(_entered, _sticksPerPack),
                 ),
                 validator: (value) => (int.tryParse(value ?? '') ?? 0) < 1
                     ? 'Isi bilangan bulat ≥ 1'
@@ -513,6 +589,7 @@ class _CravingFormState extends State<CravingForm> {
   Widget build(BuildContext context) => Form(
     key: _form,
     child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -525,17 +602,11 @@ class _CravingFormState extends State<CravingForm> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: const Text(
-            'Craving adalah dorongan kuat untuk merokok atau menggunakan vape.',
+            'Craving adalah dorongan kuat untuk merokok.',
             style: TextStyle(fontSize: 12, color: CihuyColors.tealInk),
           ),
         ),
         const SizedBox(height: 20),
-        const FieldLabel('Jenis kebiasaan'),
-        HabitSelector(
-          value: _habit,
-          onChanged: (value) => setState(() => _habit = value),
-        ),
-        const SizedBox(height: 18),
         DateTimeFields(
           value: _at,
           onChanged: (value) => setState(() {
@@ -546,6 +617,8 @@ class _CravingFormState extends State<CravingForm> {
         const SizedBox(height: 18),
         const FieldLabel('Intensitas'),
         Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             for (final intensity in Intensity.values) ...[
               if (intensity.index > 0) const SizedBox(width: 8),
@@ -623,6 +696,8 @@ class _CravingFormState extends State<CravingForm> {
         const SizedBox(height: 22),
         const FieldLabel('Hasil'),
         Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: ChoiceButton(

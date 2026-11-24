@@ -11,14 +11,17 @@ Future<void> showConsumptionDetails(
   BuildContext context,
   Consumption entry,
 ) async {
+  final sticksPerPack = context.read<AppState>().sticksPerPack;
   final action = await openSheet<String>(
     context,
     _RecordDetail(
       title: 'Detail Konsumsi',
       at: entry.at,
       lines: {
-        'Jenis': entry.habit.label,
-        'Jumlah': '${entry.amount} ${entry.habit.unit}',
+        'Jenis': entry.habit.legacyLabel,
+        'Jumlah': entry.habit.isLegacy
+            ? '${entry.amount} ${entry.habit.unit}'
+            : cigaretteAmountLabel(entry.amount, sticksPerPack),
         'Catatan': entry.note.isEmpty
             ? 'Tidak ada catatan tambahan.'
             : entry.note,
@@ -90,6 +93,7 @@ class _RecordDetail extends StatelessWidget {
   final Map<String, String> lines;
   @override
   Widget build(BuildContext context) => Column(
+    mainAxisAlignment: MainAxisAlignment.start,
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       SheetHeading(title, subtitle: '${fullDate(at)} · ${clockLabel(at)}'),
@@ -97,6 +101,7 @@ class _RecordDetail extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(bottom: 16),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(line.key, style: Theme.of(context).textTheme.bodySmall),

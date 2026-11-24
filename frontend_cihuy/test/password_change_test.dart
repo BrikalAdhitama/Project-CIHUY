@@ -79,9 +79,7 @@ void main() {
         currentPassword: 'kata-sandi-lama',
         newPassword: 'kata-sandi-baru',
       ),
-      throwsA(
-        const LocalAuthException('Tidak ada sesi akun yang aktif.'),
-      ),
+      throwsA(const LocalAuthException('Tidak ada sesi akun yang aktif.')),
     );
   });
 
@@ -115,24 +113,27 @@ void main() {
     );
   });
 
-  test('kata sandi berhasil diubah; kata sandi lama tidak bisa masuk', () async {
-    final repo = await registered();
-    await repo.changePassword(
-      currentPassword: 'kata-sandi-lama',
-      newPassword: 'kata-sandi-baru',
-    );
-    await expectLater(
-      repo.signIn(email: 'budi@contoh.test', password: 'kata-sandi-lama'),
-      throwsA(
-        const LocalAuthException('Email atau kata sandi tidak sesuai.'),
-      ),
-    );
-    final account = await repo.signIn(
-      email: 'budi@contoh.test',
-      password: 'kata-sandi-baru',
-    );
-    expect(account.email, 'budi@contoh.test');
-  });
+  test(
+    'kata sandi berhasil diubah; kata sandi lama tidak bisa masuk',
+    () async {
+      final repo = await registered();
+      await repo.changePassword(
+        currentPassword: 'kata-sandi-lama',
+        newPassword: 'kata-sandi-baru',
+      );
+      await expectLater(
+        repo.signIn(email: 'budi@contoh.test', password: 'kata-sandi-lama'),
+        throwsA(
+          const LocalAuthException('Email atau kata sandi tidak sesuai.'),
+        ),
+      );
+      final account = await repo.signIn(
+        email: 'budi@contoh.test',
+        password: 'kata-sandi-baru',
+      );
+      expect(account.email, 'budi@contoh.test');
+    },
+  );
 
   test('kode pemulihan tetap berlaku setelah mengubah kata sandi', () async {
     final repo = await registered();

@@ -5,13 +5,15 @@ Lingkungan: Flutter 3.38.5, Dart 3.10.4, Android SDK 36, emulator Medium Phone A
 - `flutter pub get`: berhasil.
 - `dart format lib test`: berhasil.
 - `flutter analyze`: **No issues found**.
-- Unit/widget test: **39/39 lulus**, termasuk regresi tombol catat, foto profil/crop, posisi landscape, dan rentang grafik saat memilih batang.
+- Unit/widget test: **105 lulus, 1 gagal yang sudah ada sebelumnya** (`test/session_restore_test.dart`, kegagalan hilangnya data demo saat masuk akun). Cakupan mencakup regresi tombol catat, foto profil/crop, posisi landscape, rentang grafik, serta satuan batang/bungkus.
 - `flutter build apk --debug`: berhasil, APK terpasang dan aplikasi terbuka pada emulator.
 - `dart run flutter_launcher_icons`: berhasil menghasilkan ikon Android biasa dan adaptive dari `assets/icon-app.png`. Aset yang sama dipakai pada halaman akun/onboarding, dan verifikasi diulang setelah pemasangannya.
 
 ## Cakupan otomatis
 
-`test/progress_test.dart` memeriksa agregasi beberapa catatan, 5/5 vs 6/5, koreksi historis, notifikasi state, periode target historis, deactivation, pencegahan target retroaktif, satuan rokok/vape terpisah, target gabungan, hari ini/future, streak/best streak, timer berbasis waktu kejadian/background, CRUD konsumsi/craving, validasi, batas tengah malam, target nol, data kosong, seed, akun simulasi, dan pergantian bulan/tahun.
+`test/progress_test.dart` memeriksa agregasi beberapa catatan, 5/5 vs 6/5, koreksi historis, notifikasi state, periode target historis, deactivation, pencegahan target retroaktif, perhitungan data vape lama yang tetap terpisah, target gabungan, hari ini/future, streak/best streak, timer berbasis waktu kejadian/background, CRUD konsumsi/craving, validasi, batas tengah malam, target nol, data kosong, seed, akun simulasi, dan pergantian bulan/tahun.
+
+`test/pack_unit_test.dart` memeriksa bahwa hanya rokok yang ditawarkan untuk catatan baru, label "Vape (lama)" pada data lama, konversi bungkus ke batang (2 bungkus = 24 batang), pilihan satuan yang mereset jumlah ke 1, serta preferensi isi per bungkus yang tersimpan dan dipulihkan.
 
 `test/widget_test.dart` memeriksa tiga tab, state tanggal, kembali Android, merah pada kalender/grafik/detail, outline merah, status merah tetap terlihat saat tanggal lain dipilih, edit lewat formulir dari 6 ke 5, penanda hari ini tidak menutupi merah, jumlah positif, pemicu lainnya, tidak ada konsumsi otomatis dari craving, pembatalan modal, onboarding, serta keyboard 300 px pada lebar 360 dan 430 logical pixels.
 

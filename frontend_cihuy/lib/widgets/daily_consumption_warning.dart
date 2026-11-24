@@ -10,13 +10,13 @@ enum DailyLimitStatus { safe, approaching, reached, exceeded }
 
 DailyLimitStatus _statusFor(int current, int limit) {
   if (limit <= 0) {
-    return current > 0
-        ? DailyLimitStatus.exceeded
-        : DailyLimitStatus.safe;
+    return current > 0 ? DailyLimitStatus.exceeded : DailyLimitStatus.safe;
   }
   if (current > limit) return DailyLimitStatus.exceeded;
   if (current == limit) return DailyLimitStatus.reached;
-  if (current >= limit * _approachThreshold) return DailyLimitStatus.approaching;
+  if (current >= limit * _approachThreshold) {
+    return DailyLimitStatus.approaching;
+  }
   return DailyLimitStatus.safe;
 }
 
@@ -49,8 +49,13 @@ class _DailyConsumptionWarningState extends State<DailyConsumptionWarning> {
     if (status == DailyLimitStatus.safe || status == _dismissedStatus) {
       return const SizedBox.shrink();
     }
-    final (Color background, Color ink, IconData icon, String title, String
-    message) = switch (status) {
+    final (
+      Color background,
+      Color ink,
+      IconData icon,
+      String title,
+      String message,
+    ) = switch (status) {
       DailyLimitStatus.approaching => (
         CihuyColors.amber,
         CihuyColors.amberInk,
@@ -86,9 +91,12 @@ class _DailyConsumptionWarningState extends State<DailyConsumptionWarning> {
         border: Border.all(color: ink.withValues(alpha: .14)),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               IconTile(icon, color: ink, background: Colors.white),
               const SizedBox(width: 10),
@@ -106,6 +114,8 @@ class _DailyConsumptionWarningState extends State<DailyConsumptionWarning> {
           Text(message, style: Theme.of(context).textTheme.bodySmall),
           const SizedBox(height: 12),
           Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: LinearProgressIndicator(
@@ -136,9 +146,7 @@ class _DailyConsumptionWarningState extends State<DailyConsumptionWarning> {
             alignment: AlignmentDirectional.centerEnd,
             child: TextButton(
               onPressed: () => setState(() => _dismissedStatus = status),
-              style: TextButton.styleFrom(
-                visualDensity: VisualDensity.compact,
-              ),
+              style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
               child: const Text('Dimengerti'),
             ),
           ),

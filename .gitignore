@@ -4,7 +4,11 @@
 .codex/
 
 # Backend will be added when its first implementation is ready.
-/backend_cihuy/
+**/node_modules/
+**/data/
+**/service-account*.json
+**/firebase.local.json
+**/firebase_local.xml
 
 # Local configuration and credentials
 .env
@@ -24,3 +28,7 @@
 *.apk
 *.aab
 *.log
+
+# Local Supabase client configuration
+**/supabase.local.json
+**/release.local.json

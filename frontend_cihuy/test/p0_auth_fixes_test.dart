@@ -63,38 +63,41 @@ void main() {
     authRepository: repository,
   );
 
-  test('change password then edit profile keeps the new password working', () async {
-    final repo = LocalAuthRepository();
-    final state = appState(repo);
-    await state.register(
-      name: 'Budi Santoso',
-      email: 'budi@contoh.test',
-      password: 'kata-sandi-lama',
-    );
-    expect(
-      await state.changePassword(
-        currentPassword: 'kata-sandi-lama',
-        newPassword: 'kata-sandi-baru',
-      ),
-      isTrue,
-    );
-    state.updateProfile(name: 'Budi Terbaru');
-    expect(
-      state.profile.name,
-      'Budi Terbaru',
-      reason: 'in-memory profile must follow edit',
-    );
-    await expectLater(
-      repo.signIn(email: 'budi@contoh.test', password: 'kata-sandi-lama'),
-      throwsA(isA<LocalAuthException>()),
-      reason: 'old password must be rejected after profile edit',
-    );
-    final account = await repo.signIn(
-      email: 'budi@contoh.test',
-      password: 'kata-sandi-baru',
-    );
-    expect(account.name, 'Budi Terbaru');
-  });
+  test(
+    'change password then edit profile keeps the new password working',
+    () async {
+      final repo = LocalAuthRepository();
+      final state = appState(repo);
+      await state.register(
+        name: 'Budi Santoso',
+        email: 'budi@contoh.test',
+        password: 'kata-sandi-lama',
+      );
+      expect(
+        await state.changePassword(
+          currentPassword: 'kata-sandi-lama',
+          newPassword: 'kata-sandi-baru',
+        ),
+        isTrue,
+      );
+      state.updateProfile(name: 'Budi Terbaru');
+      expect(
+        state.profile.name,
+        'Budi Terbaru',
+        reason: 'in-memory profile must follow edit',
+      );
+      await expectLater(
+        repo.signIn(email: 'budi@contoh.test', password: 'kata-sandi-lama'),
+        throwsA(isA<LocalAuthException>()),
+        reason: 'old password must be rejected after profile edit',
+      );
+      final account = await repo.signIn(
+        email: 'budi@contoh.test',
+        password: 'kata-sandi-baru',
+      );
+      expect(account.name, 'Budi Terbaru');
+    },
+  );
 
   test('recovery code is cleared from memory after sign out', () async {
     final repo = LocalAuthRepository();
@@ -109,48 +112,54 @@ void main() {
     expect(state.recoveryCode, isNull);
   });
 
-  test('recovery code is cleared after account switching and display', () async {
-    final repo = LocalAuthRepository();
-    final state = appState(repo);
-    await state.register(
-      name: 'Sari Rahayu',
-      email: 'sari@contoh.test',
-      password: 'kata-sandi-aman',
-    );
-    state.startDemo();
-    expect(state.recoveryCode, isNull);
-    final other = appState(LocalAuthRepository());
-    await other.register(
-      name: 'Budi',
-      email: 'budi@contoh.test',
-      password: 'kata-sandi-aman',
-    );
-    expect(other.recoveryCode, isNotNull);
-    other.clearRecoveryCode();
-    expect(other.recoveryCode, isNull);
-  });
+  test(
+    'recovery code is cleared after account switching and display',
+    () async {
+      final repo = LocalAuthRepository();
+      final state = appState(repo);
+      await state.register(
+        name: 'Sari Rahayu',
+        email: 'sari@contoh.test',
+        password: 'kata-sandi-aman',
+      );
+      state.startDemo();
+      expect(state.recoveryCode, isNull);
+      final other = appState(LocalAuthRepository());
+      await other.register(
+        name: 'Budi',
+        email: 'budi@contoh.test',
+        password: 'kata-sandi-aman',
+      );
+      expect(other.recoveryCode, isNotNull);
+      other.clearRecoveryCode();
+      expect(other.recoveryCode, isNull);
+    },
+  );
 
-  test('galat pemulihan yang gagal tidak menempel setelah dialog ditutup', () async {
-    final repo = LocalAuthRepository();
-    final state = appState(repo);
-    await state.register(
-      name: 'Sari Rahayu',
-      email: 'sari@contoh.test',
-      password: 'kata-sandi-aman',
-    );
-    state.signOut();
-    await state.resetPassword(
-      email: 'sari@contoh.test',
-      code: '000000000000',
-      password: 'kata-sandi-baru',
-    );
-    expect(state.authError, 'Email atau kode pemulihan tidak sesuai.');
-    state.clearAuthError();
-    expect(state.authError, isNull);
-    expect(
-      state.signedIn,
-      isFalse,
-      reason: 'reset gagal tidak boleh membuat sesi',
-    );
-  });
+  test(
+    'galat pemulihan yang gagal tidak menempel setelah dialog ditutup',
+    () async {
+      final repo = LocalAuthRepository();
+      final state = appState(repo);
+      await state.register(
+        name: 'Sari Rahayu',
+        email: 'sari@contoh.test',
+        password: 'kata-sandi-aman',
+      );
+      state.signOut();
+      await state.resetPassword(
+        email: 'sari@contoh.test',
+        code: '000000000000',
+        password: 'kata-sandi-baru',
+      );
+      expect(state.authError, 'Email atau kode pemulihan tidak sesuai.');
+      state.clearAuthError();
+      expect(state.authError, isNull);
+      expect(
+        state.signedIn,
+        isFalse,
+        reason: 'reset gagal tidak boleh membuat sesi',
+      );
+    },
+  );
 }

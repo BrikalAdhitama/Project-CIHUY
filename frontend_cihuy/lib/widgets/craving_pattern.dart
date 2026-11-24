@@ -30,6 +30,7 @@ class CravingPatternSummary extends StatelessWidget {
     if (state.cravings.isEmpty) {
       return SurfaceCard(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             title,
@@ -46,6 +47,7 @@ class CravingPatternSummary extends StatelessWidget {
     if (recent.isEmpty) {
       return SurfaceCard(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             title,
@@ -71,12 +73,15 @@ class CravingPatternSummary extends StatelessWidget {
     final maxTrigger = topTriggers.isEmpty ? 1 : topTriggers.first.value;
     final intensityCounts = {
       for (final intensity in Intensity.values)
-        intensity: recent.where((craving) => craving.intensity == intensity).length,
+        intensity: recent
+            .where((craving) => craving.intensity == intensity)
+            .length,
     };
     final resisted = recent.where((craving) => craving.resisted).length;
 
     return SurfaceCard(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           title,
@@ -94,6 +99,8 @@ class CravingPatternSummary extends StatelessWidget {
             const SizedBox(height: 8),
             for (final trigger in topTriggers) ...[
               Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
                     child: Text(

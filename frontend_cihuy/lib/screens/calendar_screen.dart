@@ -1,4 +1,4 @@
-﻿import 'dart:math' as math;
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +24,7 @@ class CalendarScreen extends StatelessWidget {
         const SizedBox(height: 6),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _MonthButton(
               icon: Icons.chevron_left,
@@ -66,6 +67,7 @@ class CalendarScreen extends StatelessWidget {
           ),
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text('Lihat detail progres'),
               SizedBox(width: 4),
@@ -111,8 +113,12 @@ class MonthGrid extends StatelessWidget {
     return SurfaceCard(
       padding: const EdgeInsets.fromLTRB(10, 16, 10, 14),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               for (final day in [
                 'Min',
@@ -269,6 +275,8 @@ class _Legend extends StatelessWidget {
   final Color color;
   @override
   Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: [
       Container(
@@ -314,6 +322,7 @@ class _ConsumptionChartState extends State<ConsumptionChart> {
         state.targets.any((target) => target.habit == Habit.vape);
     return SurfaceCard(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionTitle(
@@ -326,6 +335,8 @@ class _ConsumptionChartState extends State<ConsumptionChart> {
           ),
           const SizedBox(height: 10),
           Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: SegmentedButton<int>(
@@ -349,7 +360,10 @@ class _ConsumptionChartState extends State<ConsumptionChart> {
                   'Jumlah ${habit.unit}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 10, color: CihuyColors.muted),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: CihuyColors.muted,
+                  ),
                   textAlign: TextAlign.right,
                 ),
               ),
@@ -357,11 +371,16 @@ class _ConsumptionChartState extends State<ConsumptionChart> {
           ),
           if (showHabit) ...[
             const SizedBox(height: 10),
-            HabitSelector(value: habit, onChanged: state.selectHabit),
+            HabitSelector(
+              value: habit,
+              onChanged: state.selectHabit,
+              habits: Habit.values,
+            ),
           ],
           const SizedBox(height: 10),
           if (_days == 7)
             Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 for (var index = 0; index < _days; index++)
@@ -373,10 +392,8 @@ class _ConsumptionChartState extends State<ConsumptionChart> {
                       habit: habit,
                       exceeded: state.progress.exceeds(dates[index], habit),
                       selected: sameDay(dates[index], selectedDay),
-                      onTap: () => state.selectDate(
-                        dates[index],
-                        keepChartRange: true,
-                      ),
+                      onTap: () =>
+                          state.selectDate(dates[index], keepChartRange: true),
                     ),
                   ),
               ],
@@ -387,6 +404,7 @@ class _ConsumptionChartState extends State<ConsumptionChart> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     for (var index = 0; index < _days; index++)
@@ -397,10 +415,7 @@ class _ConsumptionChartState extends State<ConsumptionChart> {
                           amount: values[index],
                           maximum: maximum,
                           habit: habit,
-                          exceeded: state.progress.exceeds(
-                            dates[index],
-                            habit,
-                          ),
+                          exceeded: state.progress.exceeds(dates[index], habit),
                           selected: sameDay(dates[index], selectedDay),
                           onTap: () => state.selectDate(
                             dates[index],
@@ -459,12 +474,15 @@ class ChartBar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 3),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
               height: 97,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
                     '$amount',
@@ -538,11 +556,13 @@ class DailyDetails extends StatelessWidget {
     return SurfaceCard(
       padding: EdgeInsets.zero,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -578,6 +598,8 @@ class DailyDetails extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const Expanded(
                   child: Text(
@@ -606,7 +628,8 @@ class DailyDetails extends StatelessWidget {
                 background: const Color(0xFFFFF3C7),
               ),
               title: Text(
-                '${entry.habit.label} · ${entry.amount} ${entry.habit.unit}',
+                '${entry.habit.legacyLabel} · '
+                '${entry.habit.isLegacy ? '${entry.amount} ${entry.habit.unit}' : cigaretteAmountLabel(entry.amount, state.sticksPerPack)}',
                 style: const TextStyle(fontSize: 13),
               ),
               trailing: Text(
@@ -620,6 +643,8 @@ class DailyDetails extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const Expanded(
                   child: Text(

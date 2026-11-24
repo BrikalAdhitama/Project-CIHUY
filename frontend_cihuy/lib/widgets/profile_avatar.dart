@@ -17,6 +17,8 @@ class ProfileAvatar extends StatelessWidget {
       builder: (context) => SafeArea(
         child: SingleChildScrollView(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               const Padding(
@@ -31,7 +33,15 @@ class ProfileAvatar extends StatelessWidget {
                 title: const Text('Pilih dari galeri'),
                 onTap: () => Navigator.pop(context, 'pick'),
               ),
-              if (state.profile.photo != null)
+              if (state.profile.avatarPath != null &&
+                  state.profile.photo == null)
+                ListTile(
+                  leading: const IconTile(Icons.refresh),
+                  title: const Text('Muat ulang foto'),
+                  onTap: () => Navigator.pop(context, 'reload'),
+                ),
+              if (state.profile.photo != null ||
+                  state.profile.avatarPath != null)
                 ListTile(
                   leading: const Icon(
                     Icons.delete_outline,
@@ -43,11 +53,16 @@ class ProfileAvatar extends StatelessWidget {
                   ),
                   onTap: () => Navigator.pop(context, 'remove'),
                 ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(18, 8, 18, 8),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 8, 18, 8),
                 child: Text(
-                  'Foto hanya tersimpan selama sesi aplikasi ini.',
-                  style: TextStyle(color: CihuyColors.muted, fontSize: 12),
+                  state.usesCloudAuth
+                      ? 'Foto tersimpan di akunmu. Maksimal 5 MB setelah diproses.'
+                      : 'Foto hanya tersimpan selama sesi aplikasi ini.',
+                  style: const TextStyle(
+                    color: CihuyColors.muted,
+                    fontSize: 12,
+                  ),
                 ),
               ),
               TextButton(
@@ -62,7 +77,9 @@ class ProfileAvatar extends StatelessWidget {
     );
     if (!context.mounted || action == null) return;
     if (action == 'remove') {
-      state.removeProfilePhoto();
+      await state.removeProfilePhoto();
+    } else if (action == 'reload') {
+      await state.reloadProfilePhoto();
     } else {
       await state.changeProfilePhoto();
     }

@@ -24,7 +24,7 @@ ThemeData cihuyTheme() {
     surface: Colors.white,
   );
   final border = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(12),
+    borderRadius: BorderRadius.circular(14),
     borderSide: const BorderSide(color: CihuyColors.border),
   );
   return ThemeData(
@@ -77,21 +77,34 @@ ThemeData cihuyTheme() {
       border: border,
       enabledBorder: border,
       focusedBorder: border.copyWith(
-        borderSide: const BorderSide(color: CihuyColors.teal, width: 1.5),
+        borderSide: const BorderSide(color: CihuyColors.tealInk, width: 1.6),
       ),
       errorBorder: border.copyWith(
         borderSide: const BorderSide(color: CihuyColors.red),
       ),
+      focusedErrorBorder: border.copyWith(
+        borderSide: const BorderSide(color: CihuyColors.red, width: 1.6),
+      ),
+      filled: true,
+      fillColor: const Color(0xFFF9FBFB),
       hintStyle: const TextStyle(fontSize: 13, color: CihuyColors.muted),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
+      errorStyle: const TextStyle(
+        fontSize: 11.5,
+        height: 1.35,
+        color: CihuyColors.red,
+      ),
+      errorMaxLines: 2,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 16),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: CihuyColors.teal,
+        backgroundColor: CihuyColors.tealInk,
         foregroundColor: Colors.white,
+        disabledBackgroundColor: CihuyColors.tealInk.withValues(alpha: .55),
+        disabledForegroundColor: Colors.white,
         minimumSize: const Size(double.infinity, 52),
-        textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
@@ -99,8 +112,13 @@ ThemeData cihuyTheme() {
         minimumSize: const Size(0, 44),
         foregroundColor: CihuyColors.ink,
         side: const BorderSide(color: CihuyColors.border),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(

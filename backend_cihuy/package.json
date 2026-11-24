@@ -1,0 +1,12 @@
+{
+  "name": "cihuy-notifications",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "dispatch": "node --env-file-if-exists=.env dispatch.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": { "firebase-admin": "^14.5.0" }
+}

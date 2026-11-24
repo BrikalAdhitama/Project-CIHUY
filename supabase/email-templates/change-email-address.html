@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>Konfirmasi perubahan email CIHUY</title>
+</head>
+<body style="margin:0;padding:0;width:100%;background-color:#F7F8FA;font-family:Arial,Helvetica,sans-serif;color:#172333;-webkit-text-size-adjust:100%;">
+  <div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">Tinjau dan konfirmasi permintaan perubahan email akunmu.</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F7F8FA">
+    <tr>
+      <td align="center" style="padding:32px 12px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:560px;table-layout:fixed;">
+          <tr>
+            <td style="padding:0 12px 20px;">
+              <p style="margin:0;font-size:26px;line-height:32px;font-weight:bold;letter-spacing:2px;color:#008D8A;">CIHUY</p>
+              <p style="margin:4px 0 0;font-size:12px;line-height:20px;color:#59697E;">Control It, Hold Yourself</p>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="#FFFFFF" style="padding:28px 24px;border:1px solid #E3E6EB;border-top:4px solid #31C5C2;border-radius:12px;">
+              <h1 style="margin:0 0 16px;font-size:24px;line-height:32px;font-weight:bold;color:#172333;">Konfirmasi perubahan email</h1>
+              <p style="margin:0 0 24px;font-size:15px;line-height:25px;color:#46566B;">Kami menerima permintaan untuk mengganti email akun CIHUY menjadi <strong style="overflow-wrap:anywhere;word-break:break-word;">{{ .NewEmail }}</strong>. Jika ini permintaanmu, konfirmasikan melalui tombol berikut.</p>
+
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+                    <tr><td align="center" bgcolor="#008D8A" style="border-radius:8px;padding:14px 20px;"><a href="{{ .ConfirmationURL }}" style="display:inline-block;color:#FFFFFF;font-size:15px;line-height:22px;font-weight:bold;text-decoration:none;">Konfirmasi perubahan email</a></td></tr>
+                  </table>
+                  <p style="margin:20px 0 8px;font-size:13px;line-height:21px;color:#59697E;">Jika tombol tidak berfungsi, salin tautan berikut ke browser:</p>
+                  <p style="margin:0;font-size:12px;line-height:20px;word-break:break-all;overflow-wrap:anywhere;"><a href="{{ .ConfirmationURL }}" style="color:#008D8A;text-decoration:underline;word-break:break-all;">{{ .ConfirmationURL }}</a></p>
+                  <p style="margin:16px 0 0;font-size:13px;line-height:21px;color:#59697E;">Tautan ini memiliki batas waktu dan hanya dapat digunakan sekali.</p>
+              <p style="margin:24px 0 0;font-size:13px;line-height:22px;color:#46566B;">Jika konfirmasi dikirim ke alamat lama dan alamat baru, selesaikan konfirmasi dari kedua email tersebut.</p>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:24px;">
+                <tr><td style="border-top:1px solid #E3E6EB;padding-top:20px;font-size:12px;line-height:20px;color:#59697E;">Jika kamu tidak meminta perubahan ini, jangan konfirmasikan. Periksa keamanan akunmu melalui aplikasi CIHUY.</td></tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:20px 12px 0;font-size:12px;line-height:20px;color:#59697E;">
+              Email otomatis dari CIHUY.<br>Langkah kecil untuk kebiasaan yang lebih sehat.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -32,6 +32,8 @@ class HomeScreen extends StatelessWidget {
         SurfaceCard(
           onTap: () => state.selectDate(today, openCalendar: true),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SectionTitle(
                 'Rangkuman Mingguan',
@@ -42,6 +44,7 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
@@ -75,8 +78,8 @@ class HomeScreen extends StatelessWidget {
                   progress.targetOn(today, Habit.vape) != null) ...[
                 const SizedBox(height: 12),
                 Text(
-                  'Rokok: ${progress.totalInRange(from, today, Habit.cigarette)} batang · '
-                  'Vape: ${progress.totalInRange(from, today, Habit.vape)} hisapan',
+                  'Rokok: ${cigaretteAmountLabel(progress.totalInRange(from, today, Habit.cigarette), state.sticksPerPack)} · '
+                  'Vape (lama): ${progress.totalInRange(from, today, Habit.vape)} hisapan',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
@@ -86,6 +89,7 @@ class HomeScreen extends StatelessWidget {
         const SizedBox(height: 16),
         SurfaceCard(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SectionTitle('Motivasi'),
@@ -166,6 +170,7 @@ class HomeScreen extends StatelessWidget {
         const SizedBox(height: 18),
         SurfaceCard(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SectionTitle(
@@ -223,6 +228,8 @@ class _DailyLimitWarnings extends StatelessWidget {
           ),
     ];
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         for (final (index, entry) in entries.indexed) ...[
           if (index > 0) const SizedBox(height: 10),
@@ -284,9 +291,12 @@ class _QuitTimerCardState extends State<QuitTimerCard>
     return SurfaceCard(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               IconTheme(
                 data: IconThemeData(size: 14, color: CihuyColors.muted),
@@ -305,11 +315,14 @@ class _QuitTimerCardState extends State<QuitTimerCard>
           SizedBox(
             width: values.length == 4 ? 290 : 228,
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 for (final value in values)
                   Expanded(
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         FittedBox(
                           fit: BoxFit.scaleDown,
@@ -342,6 +355,8 @@ class _QuitTimerCardState extends State<QuitTimerCard>
           const SizedBox(height: 12),
           IntrinsicHeight(
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   child: _Streak(
@@ -371,6 +386,8 @@ class _Streak extends StatelessWidget {
   final String label;
   @override
   Widget build(BuildContext context) => Column(
+    mainAxisAlignment: MainAxisAlignment.start,
+    crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       Text(
         '$value',
@@ -396,6 +413,8 @@ class SummaryStat extends StatelessWidget {
   final String? unit;
   @override
   Widget build(BuildContext context) => Column(
+    mainAxisAlignment: MainAxisAlignment.start,
+    crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       IconTheme(
         data: const IconThemeData(color: CihuyColors.teal, size: 22),
@@ -443,13 +462,16 @@ class _TargetProgress extends StatelessWidget {
   Widget build(BuildContext context) {
     final exceeded = actual > limit;
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: Text(
-                habit.label,
+                habit.legacyLabel,
                 style: const TextStyle(color: CihuyColors.muted),
               ),
             ),

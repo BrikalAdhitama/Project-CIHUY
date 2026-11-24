@@ -61,6 +61,8 @@ class SectionTitle extends StatelessWidget {
   final Widget? trailing;
   @override
   Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.start,
     children: [
       Expanded(
         child: Text(title, style: Theme.of(context).textTheme.titleSmall),
@@ -116,18 +118,26 @@ class HabitSelector extends StatelessWidget {
     super.key,
     required this.value,
     required this.onChanged,
+    this.habits = Habit.tracked,
   });
   final Habit value;
   final ValueChanged<Habit> onChanged;
+
+  /// Jenis yang ditampilkan. Bawaannya hanya jenis yang masih bisa dicatat;
+  /// tampilan riwayat dapat mengirim [Habit.values] agar vape lama tetap
+  /// terlihat.
+  final List<Habit> habits;
   @override
   Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.start,
     children: [
-      for (final habit in Habit.values) ...[
-        if (habit.index > 0) const SizedBox(width: 8),
+      for (final (index, habit) in habits.indexed) ...[
+        if (index > 0) const SizedBox(width: 8),
         Expanded(
           child: ChoiceButton(
             selected: value == habit,
-            label: habit.label,
+            label: habit.legacyLabel,
             icon: habitIcon(habit),
             onTap: () => onChanged(habit),
           ),
@@ -165,6 +175,7 @@ class ChoiceButton extends StatelessWidget {
         side: BorderSide(color: selected ? activeColor : CihuyColors.border),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (icon != null) ...[
@@ -221,6 +232,8 @@ class EmptyMessage extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 18),
     child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Icon(icon, size: 28, color: CihuyColors.muted.withValues(alpha: .5)),
         const SizedBox(height: 8),
@@ -252,6 +265,8 @@ class ExceededBadge extends StatelessWidget {
       borderRadius: BorderRadius.circular(20),
     ),
     child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         const Icon(Icons.close_rounded, size: 14, color: CihuyColors.red),
@@ -331,7 +346,9 @@ class SheetHeading extends StatelessWidget {
   final String? subtitle;
   @override
   Widget build(BuildContext context) => Column(
+    mainAxisAlignment: MainAxisAlignment.start,
     crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
     children: [
       Center(
         child: Container(

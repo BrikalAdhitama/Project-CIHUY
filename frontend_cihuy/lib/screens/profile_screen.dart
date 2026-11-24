@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/records.dart';
 import '../providers/app_state.dart';
+import '../services/unit_settings.dart';
 import '../utils/app_theme.dart';
 import '../utils/dates.dart';
 import '../widgets/asset_icon.dart';
 import '../widgets/common.dart';
 import '../widgets/profile_avatar.dart';
-import 'auth_screen.dart';
-import 'targets_screen.dart';
+import 'settings_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -38,6 +38,7 @@ class ProfileScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
@@ -50,11 +51,14 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 23),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           const ProfileAvatar(),
                           const SizedBox(width: 16),
                           Expanded(
                             child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
@@ -109,6 +113,8 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       const SizedBox(height: 20),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Expanded(
                             child: _ProfileStat(
@@ -141,12 +147,15 @@ class ProfileScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(18),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const _GroupLabel('INFORMASI AKUN'),
                 SurfaceCard(
                   padding: EdgeInsets.zero,
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       _InfoRow(
                         icon: const CihuyAssetIcon(CihuyAssetIcon.profile),
@@ -173,7 +182,7 @@ class ProfileScreen extends StatelessWidget {
                           const _EditProfileForm(isName: false),
                         ),
                       ),
-                      for (final habit in Habit.values) ...[
+                      for (final habit in Habit.tracked) ...[
                         const Divider(),
                         _InfoRow(
                           icon: habitIcon(habit),
@@ -181,115 +190,51 @@ class ProfileScreen extends StatelessWidget {
                           value: state.baseline(habit) == null
                               ? 'Belum diisi'
                               : '${state.baseline(habit)} ${habit.unit}/hari',
-                          onEdit: () => openSheet(
-                            context,
-                            _BaselineForm(habit: habit),
-                          ),
+                          onEdit: () =>
+                              openSheet(context, _BaselineForm(habit: habit)),
                         ),
                       ],
+                      const Divider(),
+                      _InfoRow(
+                        icon: const Icon(Icons.inventory_2_outlined),
+                        label: 'Isi per bungkus',
+                        value: '${state.sticksPerPack} batang',
+                        onEdit: () => openSheet(context, const _PackSizeForm()),
+                      ),
                     ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const _GroupLabel('KEAMANAN'),
-                SurfaceCard(
-                  padding: EdgeInsets.zero,
-                  child: ListTile(
-                    leading: const IconTile(Icons.lock_outline),
-                    title: const Text(
-                      'Ubah kata sandi',
-                      style: TextStyle(fontSize: 13),
-                    ),
-                    trailing: const Icon(
-                      Icons.expand_more,
-                      size: 18,
-                      color: CihuyColors.muted,
-                    ),
-                    onTap: () => openSheet(context, const PasswordForm()),
                   ),
                 ),
                 const SizedBox(height: 16),
                 const _GroupLabel('LAINNYA'),
                 SurfaceCard(
                   padding: EdgeInsets.zero,
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: const IconTile(Icons.adjust),
-                        title: const Text(
-                          'Target harian',
-                          style: TextStyle(fontSize: 13),
-                        ),
-                        trailing: const Icon(
-                          Icons.chevron_right,
-                          size: 18,
-                          color: CihuyColors.muted,
-                        ),
-                        onTap: () => openTargets(context),
+                  child: ListTile(
+                    leading: const IconTile(Icons.settings_outlined),
+                    title: const Text(
+                      'Pengaturan',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                    trailing: const Icon(
+                      Icons.chevron_right,
+                      size: 18,
+                      color: CihuyColors.muted,
+                    ),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const SettingsScreen(),
                       ),
-                      const Divider(),
-                      if (state.hasAccount) ...[
-                        ListTile(
-                          leading: const IconTile(
-                            Icons.delete_outline,
-                            color: CihuyColors.red,
-                            background: Color(0xFFFFF2F3),
-                          ),
-                          title: const Text(
-                            'Hapus akun',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: CihuyColors.red,
-                            ),
-                          ),
-                          onTap: () async {
-                            final yes = await confirmAction(
-                              context,
-                              title: 'Hapus akun?',
-                              message:
-                                  'Akun terdaftar (email, kata sandi, dan pengaturan) dihapus permanen dari perangkat ini. Tindakan ini tidak bisa dibatalkan.',
-                              confirm: 'Hapus akun',
-                            );
-                            if (yes) await state.deleteAccount();
-                          },
-                        ),
-                        const Divider(),
-                      ],
-                      ListTile(
-                        leading: const IconTile(
-                          Icons.logout,
-                          color: CihuyColors.red,
-                          background: Color(0xFFFFF2F3),
-                        ),
-                        title: const Text(
-                          'Keluar',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: CihuyColors.red,
-                          ),
-                        ),
-                        onTap: () async {
-                          final yes = await confirmAction(
-                            context,
-                            title: 'Keluar dari akun?',
-                            message:
-                                'Data tetap tersedia selama aplikasi belum ditutup.',
-                            confirm: 'Keluar',
-                            destructive: false,
-                          );
-                          if (yes) state.signOut();
-                        },
-                      ),
-                    ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 18),
-                const Center(
-                  child: Text(
-                    'CIHUY · Control It, Hold Yourself',
-                    style: TextStyle(fontSize: 11, color: CihuyColors.muted),
+                if (state.usesCloudAuth)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      'Profil tersimpan di Supabase. Sinkronisasi catatan konsumsi, craving, target, dan foto belum tersedia.',
+                      style: TextStyle(fontSize: 12, color: CihuyColors.muted),
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -320,6 +265,8 @@ class _ProfileStat extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
     ),
     child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           value,
@@ -372,15 +319,19 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.fromLTRB(16, 13, 12, 13),
     child: Row(
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         IconTile.child(icon),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
                     child: Text(
@@ -428,6 +379,8 @@ class _EditProfileForm extends StatefulWidget {
 }
 
 class _EditProfileFormState extends State<_EditProfileForm> {
+  bool _saving = false;
+  String? _error;
   final _form = GlobalKey<FormState>();
   late final TextEditingController _text;
   @override
@@ -449,6 +402,7 @@ class _EditProfileFormState extends State<_EditProfileForm> {
   Widget build(BuildContext context) => Form(
     key: _form,
     child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SheetHeading(widget.isName ? 'Edit nama' : 'Edit alasan berhenti'),
@@ -465,15 +419,33 @@ class _EditProfileFormState extends State<_EditProfileForm> {
               : null,
         ),
         const SizedBox(height: 20),
+        if (_error != null)
+          Text(_error!, style: const TextStyle(color: CihuyColors.red)),
         FilledButton(
-          onPressed: () {
-            if (!_form.currentState!.validate()) return;
-            context.read<AppState>().updateProfile(
-              name: widget.isName ? _text.text : null,
-              reason: widget.isName ? null : _text.text,
-            );
-            Navigator.pop(context);
-          },
+          onPressed: _saving
+              ? null
+              : () async {
+                  if (!_form.currentState!.validate()) return;
+                  setState(() {
+                    _saving = true;
+                    _error = null;
+                  });
+                  try {
+                    await context.read<AppState>().updateProfile(
+                      name: widget.isName ? _text.text : null,
+                      reason: widget.isName ? null : _text.text,
+                    );
+                    if (context.mounted) Navigator.pop(context);
+                  } catch (_) {
+                    if (mounted) {
+                      setState(
+                        () => _error = 'Perubahan belum tersimpan. Coba lagi.',
+                      );
+                    }
+                  } finally {
+                    if (mounted) setState(() => _saving = false);
+                  }
+                },
           child: const Text('Simpan perubahan'),
         ),
       ],
@@ -489,6 +461,8 @@ class _BaselineForm extends StatefulWidget {
 }
 
 class _BaselineFormState extends State<_BaselineForm> {
+  bool _saving = false;
+  String? _error;
   final _form = GlobalKey<FormState>();
   late final TextEditingController _text;
   @override
@@ -508,6 +482,7 @@ class _BaselineFormState extends State<_BaselineForm> {
   Widget build(BuildContext context) => Form(
     key: _form,
     child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SheetHeading(
@@ -534,16 +509,131 @@ class _BaselineFormState extends State<_BaselineForm> {
           },
         ),
         const SizedBox(height: 20),
+        if (_error != null)
+          Text(_error!, style: const TextStyle(color: CihuyColors.red)),
         FilledButton(
-          onPressed: () {
-            if (!_form.currentState!.validate()) return;
-            context.read<AppState>().updateBaseline(
-              widget.habit,
-              int.parse(_text.text),
-            );
-            Navigator.pop(context);
-          },
+          onPressed: _saving
+              ? null
+              : () async {
+                  if (!_form.currentState!.validate()) return;
+                  setState(() {
+                    _saving = true;
+                    _error = null;
+                  });
+                  try {
+                    await context.read<AppState>().updateBaseline(
+                      widget.habit,
+                      int.parse(_text.text),
+                    );
+                    if (context.mounted) Navigator.pop(context);
+                  } catch (_) {
+                    if (mounted) {
+                      setState(
+                        () => _error = 'Baseline belum tersimpan. Coba lagi.',
+                      );
+                    }
+                  } finally {
+                    if (mounted) setState(() => _saving = false);
+                  }
+                },
           child: const Text('Simpan baseline'),
+        ),
+      ],
+    ),
+  );
+}
+
+class _PackSizeForm extends StatefulWidget {
+  const _PackSizeForm();
+  @override
+  State<_PackSizeForm> createState() => _PackSizeFormState();
+}
+
+class _PackSizeFormState extends State<_PackSizeForm> {
+  final _form = GlobalKey<FormState>();
+  late final TextEditingController _text;
+  bool _saving = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _text = TextEditingController(
+      text: '${context.read<AppState>().sticksPerPack}',
+    );
+  }
+
+  @override
+  void dispose() {
+    _text.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (_saving || !_form.currentState!.validate()) return;
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await context.read<AppState>().setSticksPerPack(int.parse(_text.text));
+      if (mounted) Navigator.pop(context);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _error = 'Isi per bungkus belum tersimpan. Coba lagi.');
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Form(
+    key: _form,
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SheetHeading(
+          'Isi per bungkus',
+          subtitle:
+              'Dipakai saat mencatat konsumsi dalam satuan bungkus. Semua '
+              'catatan tetap disimpan dalam batang.',
+        ),
+        Wrap(
+          spacing: 8,
+          children: [
+            for (final preset in UnitSettings.presets)
+              ChoiceChip(
+                label: Text('$preset batang'),
+                selected: _text.text == '$preset',
+                onSelected: (_) => setState(() => _text.text = '$preset'),
+              ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        TextFormField(
+          controller: _text,
+          keyboardType: TextInputType.number,
+          maxLength: 2,
+          decoration: const InputDecoration(
+            labelText: 'Batang per bungkus',
+            suffixText: 'batang',
+            counterText: '',
+          ),
+          onChanged: (_) => setState(() {}),
+          validator: (value) {
+            final parsed = int.tryParse(value ?? '');
+            if (parsed == null || parsed < 1) return 'Isi minimal 1 batang';
+            return null;
+          },
+        ),
+        const SizedBox(height: 20),
+        if (_error != null)
+          Text(_error!, style: const TextStyle(color: CihuyColors.red)),
+        FilledButton(
+          onPressed: _saving ? null : _save,
+          child: const Text('Simpan'),
         ),
       ],
     ),
