@@ -1,54 +1,75 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hapus Akun — CIHUY</title>
-<style>
-  body { font: 16px/1.6 system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; color: #1b1b1b; }
-  h1 { font-size: 1.6rem; } h2 { font-size: 1.15rem; margin-top: 2rem; }
-  ol { padding-left: 1.2rem; } li { margin: .4rem 0; }
-  .muted { color: #555; font-size: .9rem; }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hapus Akun — CIHUY</title>
+  <meta name="description" content="Cara meminta penghapusan akun CIHUY dan data terkait, dengan atau tanpa memasang aplikasi.">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<h1>Hapus akun dan data — CIHUY</h1>
-<p>Aplikasi <strong>CIHUY</strong> (dikembangkan oleh Brikal Adhitama) menyimpan profil akun dan foto profil di server. Halaman ini menjelaskan cara meminta penghapusan akun beserta datanya.</p>
+  <header class="site">
+    <div class="wrap">
+      <a class="brand" href="index.html">CIHUY</a>
+      <nav>
+        <a href="privacy.html">Kebijakan Privasi</a>
+        <a href="delete-account.html">Hapus Akun</a>
+      </nav>
+    </div>
+  </header>
 
-<h2>Cara menghapus akun di dalam aplikasi</h2>
-<ol>
-  <li>Buka aplikasi CIHUY dan masuk ke akunmu.</li>
-  <li>Buka tab <strong>Profil</strong> → <strong>Pengaturan</strong>.</li>
-  <li>Pilih <strong>Hapus akun</strong>, lalu konfirmasi.</li>
-  <li>Akun dan data server langsung dihapus. Kamu akan keluar dari aplikasi.</li>
-</ol>
+  <main class="wrap">
+    <h1>Permintaan Penghapusan Akun</h1>
+    <p class="meta">Berlaku sejak 19 November 2026</p>
 
-<h2>Cara meminta penghapusan lewat email</h2>
-<p>Jika tidak bisa mengakses aplikasi, kirim email ke <a href="mailto:11231017@student.itk.ac.id">11231017@student.itk.ac.id</a> dari alamat email akunmu dengan subjek "Hapus akun CIHUY". Permintaan diproses maksimal 7 hari kerja.</p>
+    <p>Halaman ini menjelaskan cara menghapus akun CIHUY beserta data yang terkait. Kamu dapat melakukannya langsung dari aplikasi, atau melalui email jika aplikasi tidak terpasang.</p>
 
-<h2>Data yang dihapus</h2>
-<ul>
-  <li>Alamat email dan nama akun</li>
-  <li>ID pengguna (Firebase/Supabase) dan sesi login</li>
-  <li>Foto profil yang diunggah</li>
-  <li>Token notifikasi push</li>
-  <li>Akun autentikasi (Firebase Auth)</li>
-</ul>
+    <div class="notice">
+      <p><strong>Penting:</strong> penghapusan akun bersifat permanen dan tidak dapat dibatalkan. Kamu akan kehilangan akses ke akun tersebut beserta profil dan foto profilnya.</p>
+    </div>
 
-<h2>Data yang tetap disimpan</h2>
-<p>Catatan konsumsi, craving, dan target harian hanya tersimpan di perangkatmu dan tidak pernah dikirim ke server, sehingga tidak terpengaruh penghapusan akun. Data itu terhapus saat kamu memakai <strong>Pengaturan → Hapus semua data</strong> atau menghapus instalasi aplikasi.</p>
-<p>Salinan cadangan (backup) server yang masih memuat data akun dihapus otomatis dalam waktu paling lama 30 hari setelah permintaan.</p>
+    <h2>Cara 1 — Dari dalam aplikasi (paling cepat)</h2>
+    <ol class="steps">
+      <li>Buka aplikasi CIHUY dan masuk ke akunmu.</li>
+      <li>Buka tab <strong>Profil</strong>, lalu pilih <strong>Pengaturan</strong>.</li>
+      <li>Pilih <strong>Hapus akun</strong> dan konfirmasi.</li>
+    </ol>
+    <p>Akun, profil, dan foto profil akan dihapus. Catatan harian pada perangkat yang sedang kamu gunakan ikut dibersihkan oleh aplikasi.</p>
 
-<hr>
-<h2>Delete your account and data — CIHUY</h2>
-<p>CIHUY stores your account profile and profile photo on our servers. You can delete them at any time.</p>
-<ol>
-  <li>Open the CIHUY app and sign in.</li>
-  <li>Go to <strong>Profile</strong> → <strong>Settings</strong>.</li>
-  <li>Tap <strong>Hapus akun</strong> (Delete account) and confirm.</li>
-</ol>
-<p>Or email <a href="mailto:11231017@student.itk.ac.id">11231017@student.itk.ac.id</a> from your account address with the subject "Delete CIHUY account". We process requests within 7 business days.</p>
-<p><strong>Deleted:</strong> email address, name, user ID, profile photo, push token, and the authentication account.<br>
-<strong>Kept:</strong> smoking/craving logs are stored only on your device and are never sent to us; they are removed by Settings → Hapus semua data or by uninstalling the app. Server backups containing your account data are purged within 30 days.</p>
+    <h2>Cara 2 — Tanpa memasang aplikasi</h2>
+    <p>Kirim email dari <strong>alamat email yang terdaftar pada akun CIHUY</strong> ke:</p>
+    <p><a class="button" href="mailto:11231017@student.itk.ac.id?subject=Permintaan%20hapus%20akun%20CIHUY&amp;body=Halo%2C%20saya%20ingin%20menghapus%20akun%20CIHUY%20saya.%0A%0AEmail%20akun%3A%20%0ANama%20pada%20profil%3A%20%0A%0ASaya%20memahami%20bahwa%20penghapusan%20tidak%20dapat%20dibatalkan.">Kirim permintaan via email</a></p>
+    <ul>
+      <li>Subjek: <strong>Permintaan hapus akun CIHUY</strong></li>
+      <li>Sertakan alamat email akun dan nama yang tertera pada profil.</li>
+      <li>Jangan sertakan kata sandi, kode OTP, atau token sesi. Kami tidak pernah memintanya.</li>
+    </ul>
+
+    <h3>Verifikasi kepemilikan</h3>
+    <p>Permintaan hanya diproses jika dikirim dari alamat email yang terdaftar. Jika kamu sudah tidak dapat mengakses email tersebut, jelaskan kondisinya dalam pesan; kami dapat meminta bukti tambahan yang tidak membahayakan keamanan akun.</p>
+
+    <h3>Waktu pemrosesan</h3>
+    <p>Permintaan diverifikasi dan diproses dalam <strong>paling lama 7 hari kerja</strong> sejak email diterima. Kami akan mengirim konfirmasi setelah penghapusan selesai. Sisa salinan pada cadangan sistem penyedia layanan terhapus mengikuti siklus rotasi cadangan, paling lama 30 hari.</p>
+
+    <h2>Data yang dihapus</h2>
+    <ul>
+      <li>Akun autentikasi dan alamat email yang terdaftar.</li>
+      <li>Data profil, termasuk alasan berhenti merokok dan konsumsi awal.</li>
+      <li>Foto profil yang tersimpan pada layanan penyimpanan kami.</li>
+    </ul>
+
+    <h2>Data yang tidak dapat dihapus dari jarak jauh</h2>
+    <ul>
+      <li><strong>Catatan harian</strong> (konsumsi, craving, dan target) tersimpan di perangkatmu. Penghapusan akun dari jarak jauh tidak dapat menghapus berkas lokal. Hapus melalui aplikasi, atau kosongkan data aplikasi pada perangkat terkait.</li>
+      <li><strong>Salinan ekspor</strong> yang pernah kamu simpan di luar aplikasi (misalnya di catatan atau papan klip) dikelola sepenuhnya olehmu.</li>
+    </ul>
+
+    <h2>Pertanyaan</h2>
+    <p>Jika ada yang belum jelas, hubungi <a href="mailto:11231017@student.itk.ac.id">11231017@student.itk.ac.id</a> sebelum mengirim permintaan penghapusan.</p>
+
+    <footer class="site">
+      <p>CIHUY — Control It, Hold Yourself.</p>
+    </footer>
+  </main>
 </body>
 </html>
